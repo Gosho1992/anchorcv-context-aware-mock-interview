@@ -1,0 +1,100 @@
+﻿# Secrets / environment files
+.env
+.env.*
+!.env.example
+!.env.template
+*.env.local
+*.secrets
+*.secret
+
+# Backend-specific secrets
+anchorcv-backend/.env
+anchorcv-backend/.env.*
+!anchorcv-backend/.env.example
+
+# Frontend env local overrides
+anchorcv-frontend/.env
+anchorcv-frontend/.env.*
+!anchorcv-frontend/.env.example
+
+# Streamlit secrets (legacy app)
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+*.egg
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Node / frontend
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.yarn-cache/
+.next/
+.nuxt/
+.parcel-cache/
+
+# Build outputs
+build/
+dist/
+out/
+coverage/
+
+# Logs / temp / local artifacts
+*.log
+logs/
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# Runtime data / local DBs
+*.db
+*.sqlite
+*.sqlite3
+
+# Common backup/scratch files
+*_backup.*
+*.bak
+_copy_log.txt
+Ctmp_pip.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git internals from source snapshots
+.git/
+
+# Submission cleanup (non-source artifacts)
+anchorcv-frontend/dist.zip
+targeted_fix.py
+test_all.py
+test_cv.pdf
+test_cv.txt
+test_jd.txt

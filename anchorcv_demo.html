@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnchorCV Product Demo</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#08111f;
+  --bg-alt:#122035;
+  --panel:rgba(10,18,35,.86);
+  --panel-solid:#0a1223;
+  --border:rgba(141,170,219,.18);
+  --text:#f5f7fb;
+  --muted:#9eb0cf;
+  --accent:#6366f1;
+  --accent-2:#818cf8;
+  --accent-soft:#c7d2fe;
+  --green:#22c55e;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --shadow:0 24px 80px rgba(0,0,0,.35);
+  font-family:"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{width:1280px;height:720px;margin:0;overflow:hidden;background:var(--bg);color:var(--text)}
+body{
+  background:
+    radial-gradient(circle at top left,rgba(129,140,248,.22),transparent 25%),
+    radial-gradient(circle at bottom right,rgba(99,102,241,.18),transparent 30%),
+    linear-gradient(180deg,var(--bg),#050b14 60%);
+}
+button,input,textarea,select{font:inherit}
+button{border:none;cursor:pointer}
+#progress{position:fixed;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--accent),#a5b4fc);z-index:999;transition:width .12s linear}
+.scene{position:absolute;inset:0;opacity:0;pointer-events:none;transition:none}
+.scene.active{opacity:1;pointer-events:auto}
+.bg{position:absolute;inset:0;background:
+  radial-gradient(circle at 18% 5%,rgba(129,140,248,.22),transparent 24%),
+  radial-gradient(circle at 82% 95%,rgba(99,102,241,.18),transparent 30%)}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(141,170,219,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(141,170,219,.055) 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(180deg,rgba(0,0,0,.75),transparent 90%)}
+.center{position:relative;z-index:1;height:100%;display:grid;place-items:center;text-align:center;padding:56px}
+.eyebrow{margin:0;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-soft);font-size:12px;font-weight:700}
+.title{font-family:Georgia,serif;font-size:62px;line-height:1.02;margin:14px 0 18px;letter-spacing:-1px}
+.copy{color:var(--muted);font-size:20px;line-height:1.5;margin:0 auto;max-width:760px}
+.pill-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.pill{border:1px solid rgba(129,140,248,.36);background:rgba(99,102,241,.16);color:var(--accent-soft);border-radius:999px;padding:10px 16px;font-size:13px;font-weight:700}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:36px auto 0;width:min(760px,100%)}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:34px;color:#fff}.stat span{font-size:13px;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow)}
+.mini-panel{background:rgba(8,17,31,.6);border:1px solid var(--border);border-radius:18px}
+.two-up{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three-up{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.button{border-radius:999px;padding:12px 18px;font-weight:700;color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--border)}
+.button.primary{background:linear-gradient(135deg,var(--accent-2),var(--accent));border:none;color:#fff}
+.button.compact{padding:9px 13px;font-size:12px}
+.guide-caption{position:absolute;left:30px;right:30px;bottom:26px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:20px;background:rgba(4,9,17,.84);border:1px solid var(--border);border-radius:18px;padding:14px 18px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+.guide-caption strong{color:#fff}.guide-caption span{color:var(--muted);font-size:13px}.guide-step{color:var(--accent-soft);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.browser{position:relative;z-index:2;width:1160px;height:640px;margin:40px auto 0;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#050b14;box-shadow:0 30px 90px rgba(0,0,0,.48)}
+.browser-top{height:42px;display:flex;align-items:center;gap:10px;padding:0 16px;background:#0b1324;border-bottom:1px solid var(--border)}
+.dot{width:11px;height:11px;border-radius:50%}.url{height:26px;display:flex;align-items:center;flex:1;max-width:620px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.055);color:var(--muted);font-size:12px}
+.app{height:598px;display:grid;grid-template-columns:280px 1fr}
+.sidebar{padding:28px 26px;border-right:1px solid var(--border);background:rgba(4,9,17,.75);display:flex;flex-direction:column;gap:24px}
+.brand-title{font-family:Georgia,serif;margin:5px 0 8px;font-size:30px}.brand-copy{font-size:14px;color:var(--muted);line-height:1.45;margin:0}
+.nav{display:flex;flex-direction:column;gap:8px}.nav-item{padding:13px 15px;border-radius:14px;color:var(--text);font-size:15px}.nav-item.active{background:rgba(99,102,241,.16);border:1px solid rgba(129,140,248,.36)}
+.account{margin-top:auto;color:var(--muted);font-size:13px}.account strong{display:block;color:#fff;margin:7px 0 3px}
+.content{padding:30px;overflow:hidden}.page-title{font-family:Georgia,serif;font-size:31px;margin:6px 0 8px}.muted{color:var(--muted)}
+.form-card{padding:20px;display:flex;flex-direction:column;gap:13px;min-height:428px}
+.result-card{padding:20px;display:flex;flex-direction:column;gap:13px;min-height:428px}
+.dropzone{padding:16px;border-radius:18px;border:1px solid var(--border);background:rgba(8,17,31,.6);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.dropzone.done{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.10)}
+.field-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-soft);font-weight:700}
+select,textarea,input[type=text]{width:100%;border-radius:14px;border:1px solid var(--border);background:rgba(8,17,31,.8);color:var(--text);padding:12px 14px}
+textarea{resize:none;line-height:1.55}.button-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.preview{background:#1e293b;color:#e2e8f0;border-radius:12px;padding:16px;line-height:1.48;font-size:13px;overflow:hidden;border:1px solid rgba(148,163,184,.22);flex:1}
+.strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.strategy-box{background:rgba(15,23,42,.72);border:1px solid rgba(148,163,184,.18);border-radius:12px;padding:11px}
+.strategy-box b{font-size:12px;color:#fff}.strategy-box p{font-size:12px;color:#cbd5e1;margin:6px 0 0;line-height:1.45}
+.handoff{border:1px solid rgba(129,140,248,.42);background:rgba(99,102,241,.14);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.format{padding:12px;border-radius:18px;border:1px solid var(--border);background:rgba(8,17,31,.6)}.format.selected{background:rgba(99,102,241,.16);border-color:rgba(129,140,248,.42)}
+.format b{display:flex;justify-content:space-between;font-size:13px}.format span{font-size:11px;color:var(--muted)}
+.checkbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;gap:8px;align-items:center;font-size:13px;color:#cbd5e1}
+.color-chip{width:100%;height:36px;border-radius:12px;background:linear-gradient(90deg,#6366f1 0 33%,#22c55e 33% 66%,#f59e0b 66%);border:1px solid var(--border)}
+.cv-doc{height:100%;background:white;color:#111827;border-radius:14px;padding:24px;font-family:Arial,sans-serif;box-shadow:0 18px 42px rgba(0,0,0,.18);overflow:hidden}
+.cv-doc h3{margin:0 0 4px;font-size:20px;color:#111827}.cv-line{height:7px;background:#e5e7eb;border-radius:999px;margin:9px 0}.cv-line.accent{background:#6366f1;width:70%}.cv-section{font-size:11px;font-weight:800;color:#6366f1;margin-top:16px;border-bottom:2px solid #6366f1;padding-bottom:4px}
+.cursor{position:fixed;width:18px;height:18px;border-radius:50%;background:rgba(129,140,248,.95);z-index:9999;box-shadow:0 0 24px rgba(129,140,248,.65);display:none;transition:left .55s ease,top .55s ease,transform .16s ease}.cursor.click{transform:scale(.62);background:#fff}
+.ring{position:fixed;width:34px;height:34px;border-radius:50%;border:2px solid rgba(199,210,254,.55);z-index:9998;display:none;transition:left .55s ease,top .55s ease}
+.problem-card{padding:22px;text-align:left}.problem-card h3{margin:0 0 10px;font-size:18px}.problem-card p{margin:0;color:var(--muted);line-height:1.55;font-size:14px}
+.tour-popover{position:absolute;z-index:12;background:#0f172a;border:1px solid rgba(129,140,248,.42);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.42);padding:12px;width:310px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease}
+.tour-popover.show{opacity:1;transform:translateY(0)}
+.tour-option{padding:9px 10px;border-radius:10px;border:1px solid transparent;font-size:12px;color:#cbd5e1;line-height:1.35}
+.tour-option.active{background:rgba(99,102,241,.18);border-color:rgba(129,140,248,.42);color:#fff}
+.tour-option b{display:block;color:#fff;margin-bottom:3px}
+.tour-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tour-card{background:rgba(8,17,31,.68);border:1px solid var(--border);border-radius:16px;padding:13px}
+.tour-card b{font-size:13px}.tour-card p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.35}
+.subtitle{position:absolute;left:50%;bottom:112px;transform:translateX(-50%);z-index:18;width:min(920px,calc(100% - 80px));text-align:center;background:rgba(4,9,17,.82);border:1px solid rgba(141,170,219,.22);border-radius:999px;color:#f5f7fb;padding:12px 20px;font-size:16px;line-height:1.35;box-shadow:0 18px 50px rgba(0,0,0,.32)}
+.chrome-page{height:598px;background:#f8fafc;color:#0f172a;display:grid;grid-template-columns:1fr 380px;gap:22px;padding:24px}
+.job-page{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:22px;overflow:hidden}.job-page h2{font-size:26px;margin:8px 0}.job-meta{color:#475569}.tag{display:inline-block;border-radius:999px;background:#eef2ff;color:#4338ca;padding:5px 10px;font-size:12px;margin:7px 6px 8px 0}.job-p{color:#334155;line-height:1.6;font-size:14px}
+.extension{align-self:start;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:12px;padding:16px;box-shadow:0 18px 50px rgba(15,23,42,.28)}
+.ext-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ext-field{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;margin-bottom:10px;color:#94a3b8;font-size:12px}.ext-field.done{color:#e2e8f0;border-color:rgba(129,140,248,.58)}
+.ext-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.ext-btn{border-radius:8px;padding:10px 8px;font-size:12px;font-weight:700;color:white}.ext-btn.purple{background:#818cf8}.ext-btn.blue{background:#0ea5e9}
+.ext-result{display:none;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px;color:#e2e8f0;font-size:12px;line-height:1.5}.ext-result.show{display:block;animation:fadeUp .45s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .7s both}.delay1{animation-delay:.12s}.delay2{animation-delay:.24s}.delay3{animation-delay:.36s}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="cursor" id="cursor"></div>
+<div class="ring" id="ring"></div>
+
+<section class="scene active" id="s1">
+  <div class="bg"></div><div class="grid-bg"></div>
+  <div class="center">
+    <div>
+      <p class="eyebrow fade-up">AnchorCV demo video</p>
+      <h1 class="title fade-up delay1">AI application strategy, CV builder, and Chrome workflow.</h1>
+      <p class="copy fade-up delay2">A guided product walkthrough using the same dark indigo theme, sidebar layout, panels, buttons, and flow as the live AnchorCV app.</p>
+      <div class="pill-row fade-up delay3">
+        <span class="pill">Resume Intelligence</span>
+        <span class="pill">Application Strategy</span>
+        <span class="pill">Use in CV Builder</span>
+        <span class="pill">Chrome Extension</span>
+      </div>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 1 of 10</div><strong>Start with the product promise.</strong> <span>The viewer sees the complete workflow before the UI steps begin.</span></div></div>
+</section>
+
+<section class="scene" id="s2">
+  <div class="bg"></div><div class="grid-bg"></div>
+  <div class="center">
+    <div style="width:min(980px,100%)">
+      <p class="eyebrow">The problem</p>
+      <h2 class="title" style="font-size:48px">Manual applications waste hours and lose context.</h2>
+      <div class="three-up">
+        <div class="panel problem-card"><h3>Repeated setup</h3><p>Users copy the CV, job description, prompt instructions, and format requirements into separate tools for every application.</p></div>
+        <div class="panel problem-card"><h3>Generic output</h3><p>Most generated letters and resumes miss the user's exact CV details, target role, and international student context.</p></div>
+        <div class="panel problem-card"><h3>No handoff</h3><p>A strategy report is useful only if it can become a new resume immediately, without pasting everything again.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 2 of 10</div><strong>Frame the workflow pain.</strong> <span>The demo explains why AnchorCV connects analysis, strategy, builder, and Chrome.</span></div></div>
+</section>
+
+<section class="scene" id="sTour">
+  <div class="browser">
+    <div class="browser-top">
+      <span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>
+      <div class="url">https://app.anchorcv.com/analysis</div>
+    </div>
+    <div class="app">
+      <aside class="sidebar">
+        <div><p class="eyebrow">AnchorCV</p><h2 class="brand-title">AnchorCV</h2><p class="brand-copy">AI-powered CV builder for international students.</p></div>
+        <nav class="nav"><div class="nav-item">📊 Dashboard</div><div class="nav-item active">🧠 Resume Intelligence</div><div class="nav-item">📄 CV Builder</div><div class="nav-item">📁 My Files</div><div class="nav-item">⚙️ Account</div></nav>
+        <div class="account"><p class="eyebrow">Signed in</p><strong>Muhammad Zain</strong><span>zain@example.com</span></div>
+      </aside>
+      <main class="content" style="position:relative">
+        <div class="panel" style="padding:18px;margin-bottom:16px"><p class="eyebrow">Analysis</p><h2 class="page-title">Resume Intelligence</h2><p class="muted" style="margin:0">This tab turns one uploaded CV into several job-specific outputs.</p></div>
+        <div class="two-up">
+          <div class="panel form-card">
+            <div class="dropzone done"><div><div class="field-label">Resume upload</div><strong>Your base CV stays saved</strong></div><span style="color:#86efac">Ready</span></div>
+            <select id="tourAnalysisSelect"><option>Application Strategy</option></select>
+            <textarea rows="7">Paste the role, scholarship, or professor requirements here. AnchorCV uses this context to tailor the selected output.</textarea>
+            <div class="button-row"><button class="button primary">Generate output</button><button class="button">Clear</button></div>
+          </div>
+          <div class="panel result-card">
+            <strong>What the Analysis dropdown does</strong>
+            <div class="tour-grid">
+              <div class="tour-card"><b>Application Strategy</b><p>Creates a plan: positioning, keywords, resume edits, and cover letter angle.</p></div>
+              <div class="tour-card"><b>ATS Score & Keywords</b><p>Checks how well the CV matches a job description and highlights missing terms.</p></div>
+              <div class="tour-card"><b>Resume Improvement</b><p>Reviews the CV even without a job post and suggests stronger bullets.</p></div>
+              <div class="tour-card"><b>Job Match Score</b><p>Gives an overall % fit score across skills, experience, and keywords.</p></div>
+              <div class="tour-card"><b>Cover Letter</b><p>Writes a tailored letter from your CV and the job requirements in seconds.</p></div>
+              <div class="tour-card"><b>Email to Professor</b><p>Drafts a research inquiry or scholarship email with specific paper references.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="tour-popover" id="analysisDropdownMenu" style="left:34px;top:205px">
+          <div class="tour-option active"><b>Application Strategy</b>Best first step — creates a plan before you edit the resume.</div>
+          <div class="tour-option"><b>ATS Score & Keywords</b>See missing skills and exact role keywords for the job.</div>
+          <div class="tour-option"><b>Resume Improvement</b>General CV upgrades — works without a job post too.</div>
+          <div class="tour-option"><b>Job Match Score</b>% fit score across skills, experience, and keywords.</div>
+          <div class="tour-option"><b>Cover Letter</b>Generate a job-specific letter in seconds.</div>
+          <div class="tour-option"><b>Email to Professor</b>Draft a research inquiry or scholarship email.</div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="subtitle" id="tourSubtitle">First, the Analysis tab lets you choose what you want AnchorCV to generate from your CV.</div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 3 of 10</div><strong>Walk through Tab 1.</strong> <span>The dropdown explains each analysis output before the resume upload workflow begins.</span></div></div>
+</section>
+
+<section class="scene" id="sBuilderTour">
+  <div class="browser">
+    <div class="browser-top">
+      <span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>
+      <div class="url">https://app.anchorcv.com/builder</div>
+    </div>
+    <div class="app">
+      <aside class="sidebar">
+        <div><p class="eyebrow">AnchorCV</p><h2 class="brand-title">AnchorCV</h2><p class="brand-copy">AI-powered CV builder for international students.</p></div>
+        <nav class="nav"><div class="nav-item">📊 Dashboard</div><div class="nav-item">🧠 Resume Intelligence</div><div class="nav-item active">📄 CV Builder</div><div class="nav-item">📁 My Files</div><div class="nav-item">⚙️ Account</div></nav>
+        <div class="account"><p class="eyebrow">Signed in</p><strong>Muhammad Zain</strong><span>zain@example.com</span></div>
+      </aside>
+      <main class="content" style="position:relative">
+        <div class="panel" style="padding:18px;margin-bottom:16px"><p class="eyebrow">Builder</p><h2 class="page-title">Professional CV Builder</h2><p class="muted" style="margin:0">Tab 2 controls the resume format, language, length, tone, sections, and exports.</p></div>
+        <div class="two-up">
+          <div class="panel form-card">
+            <div class="format-grid">
+              <div class="format selected" id="tourFormat"><b>ATS-Optimized CV <span>ATS</span></b><span>Best for job applications and applicant tracking systems.</span></div>
+              <div class="format"><b>Europass CV <span>EU</span></b><span>Structured EU-style format for academic and employer submissions.</span></div>
+              <div class="format"><b>Academic CV <span>Academic</span></b><span>Research-first structure for universities and scholarships.</span></div>
+              <div class="format"><b>One-page CV <span>Compact</span></b><span>Short version for fast applications and recruiter screens.</span></div>
+            </div>
+            <div class="three-up">
+              <select id="toneSelect"><option>Professional</option><option>Academic</option><option>Concise</option></select>
+              <select id="languageSelect"><option>English</option><option>Spanish</option><option>French</option><option>German</option><option>Arabic</option></select>
+              <select id="lengthSelect"><option>Full</option><option>Condensed</option><option>Minimal</option></select>
+            </div>
+            <div class="checkbox-grid"><label class="check"><input checked type="checkbox"> Experience</label><label class="check"><input checked type="checkbox"> Skills</label><label class="check"><input checked type="checkbox"> Projects</label><label class="check"><input type="checkbox"> Publications</label></div>
+            <div class="button-row"><button class="button primary">Build CV</button><button class="button">Clear</button></div>
+          </div>
+          <div class="panel result-card">
+            <strong>Builder options</strong>
+            <div class="preview">
+              <strong style="color:#c7d2fe">Format:</strong> ATS, Europass, Academic, or One-page.<br><br>
+              <strong style="color:#c7d2fe">Language:</strong> Generate the resume in English, Spanish, French, German, Italian, Portuguese, or Arabic.<br><br>
+              <strong style="color:#c7d2fe">Length:</strong> Full for detailed roles, Condensed for tighter resumes, Minimal for short one-page applications.<br><br>
+              <strong style="color:#c7d2fe">Tone:</strong> Professional, Academic, or Concise depending on the target.
+            </div>
+          </div>
+        </div>
+        <div class="tour-popover" id="builderDropdownMenu" style="left:382px;top:310px">
+          <div class="tour-option active"><b>Professional</b>Default tone for jobs and internships.</div>
+          <div class="tour-option"><b>English / Multi-language</b>Switch the CV language before export.</div>
+          <div class="tour-option"><b>Full / Condensed / Minimal</b>Control long, short, or compact resume output.</div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="subtitle" id="builderSubtitle">In the Builder tab, you choose the CV format, language, tone, and whether the resume should be full, condensed, or minimal.</div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 4 of 10</div><strong>Walk through Tab 2.</strong> <span>Show CV formats, multi-language generation, and long or short resume length controls.</span></div></div>
+</section>
+
+<section class="scene" id="s3">
+  <div class="bg"></div><div class="grid-bg"></div>
+  <div class="center">
+    <div>
+      <p class="eyebrow">The AnchorCV workflow</p>
+      <h2 class="title" style="font-size:54px">Generate strategy once. Reuse it everywhere.</h2>
+      <p class="copy">Upload a resume, choose Application Strategy, generate a role-specific plan, then click Use in CV Builder to build a new resume based on that strategy.</p>
+      <div class="stat-row">
+        <div class="stat"><b>1</b><span>Analyse the CV against the job</span></div>
+        <div class="stat"><b>2</b><span>Send strategy into Builder guidance</span></div>
+        <div class="stat"><b>3</b><span>Export or use Chrome for faster applications</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 5 of 10</div><strong>Show the end-to-end path.</strong> <span>This scene introduces the exact feature the app supports: strategy reuse in the builder.</span></div></div>
+</section>
+
+<section class="scene" id="s4">
+  <div class="browser">
+    <div class="browser-top">
+      <span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>
+      <div class="url">https://app.anchorcv.com/analysis</div>
+    </div>
+    <div class="app">
+      <aside class="sidebar">
+        <div><p class="eyebrow">AnchorCV</p><h2 class="brand-title">AnchorCV</h2><p class="brand-copy">AI-powered CV builder for international students.</p></div>
+        <nav class="nav"><div class="nav-item">📊 Dashboard</div><div class="nav-item active">🧠 Resume Intelligence</div><div class="nav-item">📄 CV Builder</div><div class="nav-item">📁 My Files</div><div class="nav-item">⚙️ Account</div></nav>
+        <div class="account"><p class="eyebrow">Signed in</p><strong>Muhammad Zain</strong><span>zain@example.com</span></div>
+      </aside>
+      <main class="content">
+        <div class="panel" style="padding:18px;margin-bottom:16px"><p class="eyebrow">Analysis</p><h2 class="page-title">Resume Intelligence</h2><p class="muted" style="margin:0">Upload your CV and paste a job description. AnchorCV analyses fit, gaps, and gives you an action plan.</p></div>
+        <div class="two-up">
+          <div class="panel form-card">
+            <div class="dropzone" id="cvUpload"><div><div class="field-label">Resume upload</div><strong>Drop your CV here or click to upload</strong></div><span class="muted">PDF/DOCX</span></div>
+            <div class="dropzone" id="jdUpload"><div><div class="field-label">Job / Scholarship Requirements</div><strong>Optional file upload</strong></div><span class="muted">TXT/PDF</span></div>
+            <select id="analysisSelect"><option>Application Strategy</option><option>ATS Score &amp; Keywords</option><option>Resume Improvement</option><option>Job Match Score</option><option>Cover Letter</option><option>Email to Professor</option></select>
+            <textarea id="analysisText" rows="7" placeholder="Paste job or scholarship requirements for Application Strategy."></textarea>
+            <div class="button-row"><button class="button primary" id="analysisButton">Generate output</button><button class="button">Clear</button></div>
+          </div>
+          <div class="panel result-card">
+            <div class="button-row" style="justify-content:space-between"><strong>Result preview</strong></div>
+            <p class="muted" style="margin:0">Your formatted result will render here.</p>
+            <div class="preview" id="analysisPreview"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 6 of 10</div><strong>Tab 1: Analysis.</strong> <span>Select Application Strategy, paste requirements, then generate the strategy report.</span></div></div>
+</section>
+
+<section class="scene" id="s5">
+  <div class="browser">
+    <div class="browser-top">
+      <span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>
+      <div class="url">https://app.anchorcv.com/analysis</div>
+    </div>
+    <div class="app">
+      <aside class="sidebar">
+        <div><p class="eyebrow">AnchorCV</p><h2 class="brand-title">AnchorCV</h2><p class="brand-copy">AI-powered CV builder for international students.</p></div>
+        <nav class="nav"><div class="nav-item">📊 Dashboard</div><div class="nav-item active">🧠 Resume Intelligence</div><div class="nav-item">📄 CV Builder</div><div class="nav-item">📁 My Files</div><div class="nav-item">⚙️ Account</div></nav>
+        <div class="account"><p class="eyebrow">Signed in</p><strong>Muhammad Zain</strong><span>zain@example.com</span></div>
+      </aside>
+      <main class="content">
+        <div class="panel" style="padding:18px;margin-bottom:16px"><p class="eyebrow">Analysis</p><h2 class="page-title">Application Strategy Generated</h2><p class="muted" style="margin:0">The latest full text is ready for the Builder guidance field.</p></div>
+        <div class="two-up">
+          <div class="panel form-card">
+            <div class="dropzone done"><div><div class="field-label">Resume upload</div><strong>Zain_Data_Analyst_CV.pdf</strong></div><span style="color:#86efac">Ready</span></div>
+            <select><option>Application Strategy</option></select>
+            <textarea rows="9">Google Singapore - Data Analyst
+
+Requirements: SQL, Python, BigQuery, dashboarding, cross-functional communication, Trust & Safety analytics.</textarea>
+            <div class="button-row"><button class="button primary">Generate output</button><button class="button">Clear</button></div>
+          </div>
+          <div class="panel result-card">
+            <div class="button-row" style="justify-content:space-between"><strong>Result preview</strong><div class="button-row"><button class="button compact">Export PDF</button><button class="button compact">Save to Cloud</button><button class="button compact" id="useBuilder">Use in CV Builder</button></div></div>
+            <div class="preview">
+              <strong style="color:#c7d2fe">Application Strategy</strong>
+              <div class="strategy-grid">
+                <div class="strategy-box"><b>Positioning</b><p>Lead with analytics dashboards, SQL depth, and evidence of product decisions from user data.</p></div>
+                <div class="strategy-box"><b>Keyword focus</b><p>SQL, Python, BigQuery, Trust & Safety, stakeholder reporting, data visualisation.</p></div>
+                <div class="strategy-box"><b>Resume changes</b><p>Move dashboard impact bullets higher, quantify monthly active users, and add BigQuery tooling.</p></div>
+                <div class="strategy-box"><b>Cover letter angle</b><p>Connect international background, scalable systems, and clear communication with global teams.</p></div>
+              </div>
+            </div>
+            <div class="handoff"><div><strong>Strategy can build a new resume.</strong><div class="muted" style="font-size:13px">Click Use in CV Builder to prefill Builder guidance.</div></div><button class="button primary compact">Use in CV Builder</button></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 7 of 10</div><strong>Use this strategy to build a new resume.</strong> <span>The button takes the latest analysis text into the Builder tab automatically.</span></div></div>
+</section>
+
+<section class="scene" id="s6">
+  <div class="browser">
+    <div class="browser-top">
+      <span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>
+      <div class="url">https://app.anchorcv.com/builder</div>
+    </div>
+    <div class="app">
+      <aside class="sidebar">
+        <div><p class="eyebrow">AnchorCV</p><h2 class="brand-title">AnchorCV</h2><p class="brand-copy">AI-powered CV builder for international students.</p></div>
+        <nav class="nav"><div class="nav-item">📊 Dashboard</div><div class="nav-item">🧠 Resume Intelligence</div><div class="nav-item active">📄 CV Builder</div><div class="nav-item">📁 My Files</div><div class="nav-item">⚙️ Account</div></nav>
+        <div class="account"><p class="eyebrow">Signed in</p><strong>Muhammad Zain</strong><span>zain@example.com</span></div>
+      </aside>
+      <main class="content">
+        <div class="panel" style="padding:18px;margin-bottom:16px"><p class="eyebrow">Builder</p><h2 class="page-title">Professional CV Builder</h2><p class="muted" style="margin:0">Choose a format, reuse analysis guidance, customize, then export PDF or DOCX.</p></div>
+        <div class="two-up">
+          <div class="panel form-card" style="min-height:432px">
+            <div class="dropzone done"><div><div class="field-label">Resume upload</div><strong>Zain_Data_Analyst_CV.pdf</strong></div><span style="color:#86efac">Ready</span></div>
+            <div class="format-grid"><div class="format selected"><b>ATS-Optimized CV <span>ATS</span></b><span>Keyword-rich layout tuned for applicant tracking systems.</span></div><div class="format"><b>Academic CV <span>Academic</span></b><span>Research-first structure for university applications.</span></div></div>
+            <input type="text" value="Data Analyst - Google Singapore">
+            <label><div class="field-label" style="margin-bottom:7px">Requirements or analysis guidance</div><textarea rows="5">Application Strategy: Lead with analytics dashboards, SQL depth, BigQuery, Trust & Safety keywords, and quantified product impact from 15,000+ monthly active users.</textarea></label>
+            <div class="handoff"><div><strong>Latest analysis available</strong><div class="muted" style="font-size:13px">The strategy is now editable builder guidance.</div></div><button class="button compact">Use latest analysis</button></div>
+            <div class="three-up"><select><option>Professional</option></select><select><option>English</option></select><select><option>Condensed</option></select></div>
+            <div class="checkbox-grid"><label class="check"><input checked type="checkbox"> Experience</label><label class="check"><input checked type="checkbox"> Skills</label><label class="check"><input checked type="checkbox"> Projects</label><label class="check"><input type="checkbox"> Publications</label></div>
+            <div class="button-row"><button class="button primary">Build CV</button><button class="button">Clear</button></div>
+          </div>
+          <div class="panel result-card">
+            <div class="button-row" style="justify-content:space-between"><strong>Live preview</strong><div class="button-row"><button class="button compact">Export DOCX</button><button class="button compact">Export PDF</button><button class="button compact">Save to Cloud</button></div></div>
+            <div class="cv-doc">
+              <h3>Muhammad Zain Zia</h3><div style="font-size:11px;color:#4b5563">Data Analyst | SQL | Python | BigQuery | Power BI</div>
+              <div class="cv-section">PROFILE</div><div class="cv-line accent"></div><div class="cv-line" style="width:92%"></div><div class="cv-line" style="width:74%"></div>
+              <div class="cv-section">EXPERIENCE</div><div class="cv-line" style="width:96%"></div><div class="cv-line" style="width:88%"></div><div class="cv-line" style="width:80%"></div>
+              <div class="cv-section">KEY PROJECTS</div><div class="cv-line" style="width:90%"></div><div class="cv-line" style="width:68%"></div>
+              <div class="cv-section">SKILLS</div><div class="cv-line accent" style="width:86%"></div><div class="cv-line" style="width:58%"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 8 of 10</div><strong>Builder tab.</strong> <span>The strategy fills the guidance field, then the user builds and exports a tailored resume.</span></div></div>
+</section>
+
+<section class="scene" id="s7">
+  <div class="browser">
+    <div class="browser-top">
+      <span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>
+      <div class="url">https://linkedin.com/jobs/view/data-analyst-google-singapore</div>
+      <button class="button compact" style="border-radius:8px;background:#1e293b;color:#c7d2fe">AnchorCV</button>
+    </div>
+    <div class="chrome-page">
+      <div class="job-page">
+        <p class="muted" style="color:#64748b;margin:0">Google - Singapore - Full-time</p>
+        <h2>Data Analyst, Trust & Safety</h2>
+        <div class="job-meta">LinkedIn job page</div>
+        <div><span class="tag">SQL</span><span class="tag">Python</span><span class="tag">BigQuery</span><span class="tag">Dashboards</span><span class="tag">3+ years</span></div>
+        <p class="job-p">You will design dashboards, write complex SQL queries, partner with cross-functional teams, and translate data into clear operational recommendations for global Trust & Safety programs.</p>
+        <p class="job-p">The ideal candidate has strong communication skills, experience with large datasets, and the ability to explain complex findings to non-technical stakeholders.</p>
+      </div>
+      <div class="extension">
+        <div class="ext-head">
+          <strong>⚓ AnchorCV</strong>
+          <span style="font-size:11px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);border-radius:999px;padding:3px 9px;color:#86efac">Premium ✓</span>
+        </div>
+        <div class="field-label">Your CV</div><div class="ext-field done">Zain_Data_Analyst_CV.pdf — ready ✓</div>
+        <div class="field-label">Job Description</div><div class="ext-field" id="extJd">Click "Extract from Page" to auto-fill...</div>
+        <div class="ext-buttons"><button class="ext-btn purple" id="extractBtn" style="background:#0d9488">📥 Extract from Page</button><button class="ext-btn purple" style="background:#0d9488">🎯 Job Match Score</button></div>
+        <div class="ext-buttons"><button class="ext-btn purple" id="coverBtn" style="background:linear-gradient(135deg,#818cf8,#6366f1)">📝 Cover Letter</button><button class="ext-btn blue" style="background:rgba(99,102,241,.25);border:1px solid rgba(129,140,248,.35);color:#c7d2fe">📧 Prof Email</button></div>
+        <div class="ext-result" id="extResult"><strong>Dear Hiring Manager,</strong><br>I am excited to apply for the Data Analyst role at Google Singapore. My experience building Power BI dashboards for 15,000+ users, writing SQL, and translating data into product decisions aligns closely with your Trust &amp; Safety team needs...</div>
+        <button class="button primary" id="copyBtn" style="display:none;width:100%;margin-top:10px;border-radius:8px">📋 Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 9 of 10</div><strong>Chrome extension.</strong> <span>Extract the job post, generate a cover letter or professor email, then copy or insert the result.</span></div></div>
+</section>
+
+<section class="scene" id="s8">
+  <div class="bg"></div><div class="grid-bg"></div>
+  <div class="center">
+    <div>
+      <p class="eyebrow">AnchorCV</p>
+      <h2 class="title">A complete application workflow in one product.</h2>
+      <p class="copy">Analysis creates the strategy. Builder turns it into a tailored resume. Chrome brings the same context onto job pages.</p>
+      <div class="pill-row">
+        <span class="pill">Application Strategy</span>
+        <span class="pill">ATS Score &amp; Keywords</span>
+        <span class="pill">Job Match Score</span>
+        <span class="pill">CV Builder (4 formats)</span>
+        <span class="pill">Cover Letter &amp; Prof Email</span>
+        <span class="pill">Chrome Extension</span>
+      </div>
+      <div style="margin-top:28px;display:inline-flex;align-items:baseline;gap:10px;background:rgba(99,102,241,.14);border:1px solid rgba(129,140,248,.36);border-radius:16px;padding:14px 32px">
+        <span style="font-size:40px;font-weight:900;background:linear-gradient(135deg,#818cf8,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$9</span>
+        <span style="font-size:15px;color:var(--muted)">for 3 months full access</span>
+      </div>
+      <p style="margin-top:18px;font-size:20px;font-weight:700;color:var(--accent-soft)">anchorcv.com</p>
+    </div>
+  </div>
+  <div class="guide-caption"><div><div class="guide-step">Guide 10 of 10</div><strong>Close with the connected value.</strong> <span>The demo ends on the exact workflow: strategy reuse, resume build, and Chrome generation.</span></div></div>
+</section>
+
+<script>
+const scenes=["s1","s2","sTour","sBuilderTour","s3","s4","s5","s6","s7","s8"];
+const durations=[7000,8500,15000,14500,8500,16500,13500,15000,16000,9000];
+let current=0;
+let sceneTimer=null;
+let progressTimer=null;
+let progressElapsed=0;
+const cursor=document.getElementById("cursor");
+const ring=document.getElementById("ring");
+
+function totalDuration(){return durations.reduce((a,b)=>a+b,0)}
+function setScene(index){
+  clearTimeout(sceneTimer);
+  scenes.forEach((id,i)=>document.getElementById(id).classList.toggle("active",i===index));
+  current=index;
+  runScene(index);
+  sceneTimer=setTimeout(()=>setScene((index+1)%scenes.length),durations[index]);
+}
+function startProgress(){
+  clearInterval(progressTimer);
+  progressElapsed=0;
+  progressTimer=setInterval(()=>{
+    progressElapsed+=100;
+    document.getElementById("progress").style.width=Math.min(100,progressElapsed/totalDuration()*100)+"%";
+    if(progressElapsed>=totalDuration())progressElapsed=0;
+  },100);
+}
+function showCursor(x,y,delay=0,click=false,after){
+  setTimeout(()=>{
+    cursor.style.display="block";ring.style.display="block";
+    cursor.style.left=x+"px";cursor.style.top=y+"px";
+    ring.style.left=(x-8)+"px";ring.style.top=(y-8)+"px";
+    if(click){
+      setTimeout(()=>{cursor.classList.add("click");setTimeout(()=>{cursor.classList.remove("click");if(after)after()},180)},540);
+    }else if(after){setTimeout(after,600)}
+  },delay);
+}
+function hideCursor(){cursor.style.display="none";ring.style.display="none"}
+function typeInto(el,text,speed=18){
+  el.value="";
+  let i=0;
+  const timer=setInterval(()=>{el.value+=text[i]||"";i++;if(i>=text.length)clearInterval(timer)},speed);
+}
+function resetAnalysisScene(){
+  const cv=document.getElementById("cvUpload");
+  const jd=document.getElementById("analysisText");
+  const btn=document.getElementById("analysisButton");
+  const preview=document.getElementById("analysisPreview");
+  cv.classList.remove("done");
+  cv.innerHTML='<div><div class="field-label">Resume upload</div><strong>Drop your CV here or click to upload</strong></div><span class="muted">PDF/DOCX</span>';
+  jd.value="";
+  btn.textContent="Generate output";
+  btn.style.opacity="1";
+  preview.innerHTML="";
+}
+function runScene(index){
+  hideCursor();
+  const sceneId=scenes[index];
+  if(sceneId==="sTour"){
+    const menu=document.getElementById("analysisDropdownMenu");
+    const subtitle=document.getElementById("tourSubtitle");
+    menu.classList.remove("show");
+    subtitle.textContent="First, the Analysis tab lets you choose what you want AnchorCV to generate from your CV.";
+    showCursor(727,467,1200,true,()=>{
+      menu.classList.add("show");
+      subtitle.textContent="Application Strategy creates the plan. ATS finds missing keywords. Resume Improvement strengthens the CV. Cover Letter and Email generate final messages.";
+    });
+    showCursor(930,344,6500,false,()=>{
+      subtitle.textContent="The result panel explains what each output will do before you start the actual upload workflow.";
+    });
+    setTimeout(()=>hideCursor(),9800);
+  }
+  if(sceneId==="sBuilderTour"){
+    const menu=document.getElementById("builderDropdownMenu");
+    const subtitle=document.getElementById("builderSubtitle");
+    menu.classList.remove("show");
+    subtitle.textContent="In the Builder tab, you choose the CV format, language, tone, and whether the resume should be full, condensed, or minimal.";
+    showCursor(456,290,1000,true,()=>{
+      subtitle.textContent="Format cards choose the resume structure: ATS, Europass, Academic, or One-page.";
+    });
+    showCursor(725,431,4200,true,()=>{
+      menu.classList.add("show");
+      subtitle.textContent="The dropdowns control tone, multi-language generation, and long or short resume length.";
+    });
+    showCursor(507,528,8500,false,()=>{
+      subtitle.textContent="Section checkboxes let the user include or remove Experience, Skills, Projects, and Publications.";
+    });
+    setTimeout(()=>hideCursor(),11200);
+  }
+  if(sceneId==="s4"){
+    resetAnalysisScene();
+    const cv=document.getElementById("cvUpload");
+    const jd=document.getElementById("analysisText");
+    const btn=document.getElementById("analysisButton");
+    const preview=document.getElementById("analysisPreview");
+    showCursor(392,250,1000,true,()=>{
+      cv.classList.add("done");
+      cv.innerHTML='<div><div class="field-label">Resume upload</div><strong>Zain_Data_Analyst_CV.pdf</strong></div><span style="color:#86efac">Ready</span>';
+    });
+    showCursor(414,438,2500,true,()=>{
+      typeInto(jd,"Google Singapore - Data Analyst\n\nRequirements: SQL, Python, BigQuery, dashboarding, cross-functional communication, Trust & Safety analytics.",16);
+    });
+    showCursor(382,598,7700,true,()=>{btn.textContent="Running analysis...";btn.style.opacity=".74"});
+    setTimeout(()=>{
+      preview.innerHTML='<strong style="color:#c7d2fe">Generating Application Strategy...</strong><br><br>Extracting CV facts, matching role keywords, and building resume guidance for the Builder tab.';
+    },8500);
+    setTimeout(()=>hideCursor(),11800);
+  }
+  if(sceneId==="s6"){
+    showCursor(997,397,900,true);
+    setTimeout(()=>hideCursor(),2600);
+  }
+  if(sceneId==="s7"){
+    const jd=document.getElementById("extJd");
+    const result=document.getElementById("extResult");
+    const copy=document.getElementById("copyBtn");
+    jd.className="ext-field";
+    jd.textContent="Click Extract from Page to auto-fill...";
+    result.classList.remove("show");
+    copy.style.display="none";
+    showCursor(968,349,1200,true,()=>{
+      jd.className="ext-field done";
+      jd.textContent="Data Analyst - Google Singapore - SQL, Python, BigQuery, dashboards, 3+ years";
+    });
+    showCursor(950,402,4300,true);
+    setTimeout(()=>result.classList.add("show"),6100);
+    setTimeout(()=>copy.style.display="block",7600);
+    setTimeout(()=>hideCursor(),9300);
+  }
+}
+document.addEventListener("click",()=>setScene((current+1)%scenes.length));
+document.addEventListener("keydown",(event)=>{
+  if(event.key==="ArrowRight"||event.key===" ")setScene((current+1)%scenes.length);
+  if(event.key==="ArrowLeft")setScene((current-1+scenes.length)%scenes.length);
+});
+setScene(0);
+startProgress();
+</script>
+</body>
+</html>

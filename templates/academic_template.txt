@@ -1,0 +1,207 @@
+<div style="font-family: 'Georgia', serif; font-size: 12.5px; line-height: 1.6; color: #111; max-width: 820px; margin: 0 auto; padding: 8px;">
+
+  <!-- ACADEMIC HEADER: serif, formal -->
+  <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
+    <div style="font-size: 24px; font-weight: 900; color:#0f172a; letter-spacing: 0.5px; font-family: Arial, sans-serif;">{{ name }}</div>
+    <div style="margin-top: 6px; font-size: 12px; color:#475569; font-family: Arial, sans-serif;">
+      {% if email %}{{ email }}{% endif %}{% if phone %} | {{ phone }}{% endif %}{% if location %} | {{ location }}{% endif %}{% if linkedin %} | {{ linkedin }}{% endif %}
+    </div>
+  </div>
+
+  <!-- RESEARCH PROFILE / PERSONAL STATEMENT -->
+  {% if summary %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Research Profile</div>
+    <div style="color: #1e293b; font-style: italic;">{{ summary }}</div>
+  </div>
+  {% endif %}
+
+  <!-- EDUCATION: always first in academic CV -->
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Education</div>
+    {% for edu in education %}
+    <div style="margin-bottom: 12px;">
+      <table style="width:100%; border-collapse:collapse;">
+        <tr>
+          <td style="font-weight: 700; color:#0f172a; font-family: Arial, sans-serif;">{{ edu.degree }}</td>
+          <td style="text-align:right; font-size:11.5px; color:#64748b; white-space:nowrap; font-family: Arial, sans-serif;">{{ edu.start_date|format_date }} – {{ edu.end_date|format_date }}</td>
+        </tr>
+      </table>
+      <div style="color:#475569; font-family: Arial, sans-serif;">{{ edu.institution }}{% if edu.location %}, {{ edu.location }}{% endif %}</div>
+      <div style="margin-top: 4px; color:#1e293b; font-family: Arial, sans-serif;">
+        {% if edu.gpa %}<div><b>GPA:</b> {{ edu.gpa }}</div>{% endif %}
+        {% if edu.thesis %}<div><b>Thesis:</b> {{ edu.thesis }}</div>{% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div style="color:#64748b;">No education listed.</div>
+    {% endfor %}
+  </div>
+
+  <!-- TEACHING & ACADEMIC EXPERIENCE: catch TA, tutor, assistant, lecturer etc. -->
+  {% set ns = namespace(has_teaching=false) %}
+  {% for job in experience %}
+    {% set t = (job.title or "")|lower %}
+    {% if "lecturer" in t or "teacher" in t or "instructor" in t or "faculty" in t or "professor" in t or "assistant" in t or "tutor" in t or "demonstrator" in t or "supervisor" in t %}
+      {% set ns.has_teaching = true %}
+    {% endif %}
+  {% endfor %}
+
+  {% if ns.has_teaching %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Teaching &amp; Academic Experience</div>
+    {% for job in experience %}
+      {% set t = (job.title or "")|lower %}
+      {% if "lecturer" in t or "teacher" in t or "instructor" in t or "faculty" in t or "professor" in t or "assistant" in t or "tutor" in t or "demonstrator" in t or "supervisor" in t %}
+      <div style="margin-bottom: 12px;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td style="font-weight: 700; color:#0f172a; font-family: Arial, sans-serif;">{{ job.title }}</td>
+            <td style="text-align:right; font-size:11.5px; color:#64748b; white-space:nowrap; font-family: Arial, sans-serif;">{{ job.start_date|format_date }} – {% if job.end_date %}{{ job.end_date|format_date }}{% else %}Present{% endif %}</td>
+          </tr>
+        </table>
+        <div style="color:#475569; font-family: Arial, sans-serif;">{{ job.company }}{% if job.location %}, {{ job.location }}{% endif %}</div>
+        {% if job.bullets and job.bullets|length > 0 %}
+        <ul style="margin: 6px 0 0; padding-left: 18px; color:#1e293b;">
+          {% for bullet in job.bullets %}
+          <li style="margin-bottom: 2px;">{{ bullet }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- OTHER WORK EXPERIENCE (non-teaching roles) -->
+  {% set ns2 = namespace(has_other=false) %}
+  {% for job in experience %}
+    {% set t = (job.title or "")|lower %}
+    {% if not ("lecturer" in t or "teacher" in t or "instructor" in t or "faculty" in t or "professor" in t or "assistant" in t or "tutor" in t or "demonstrator" in t or "supervisor" in t) %}
+      {% set ns2.has_other = true %}
+    {% endif %}
+  {% endfor %}
+
+  {% if ns2.has_other %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Other Experience</div>
+    {% for job in experience %}
+      {% set t = (job.title or "")|lower %}
+      {% if not ("lecturer" in t or "teacher" in t or "instructor" in t or "faculty" in t or "professor" in t or "assistant" in t or "tutor" in t or "demonstrator" in t or "supervisor" in t) %}
+      <div style="margin-bottom: 10px;">
+        <table style="width:100%; border-collapse:collapse;">
+          <tr>
+            <td style="font-weight: 700; color:#0f172a; font-family: Arial, sans-serif;">{{ job.title }}</td>
+            <td style="text-align:right; font-size:11.5px; color:#64748b; white-space:nowrap; font-family: Arial, sans-serif;">{{ job.start_date|format_date }} – {% if job.end_date %}{{ job.end_date|format_date }}{% else %}Present{% endif %}</td>
+          </tr>
+        </table>
+        <div style="color:#475569; font-family: Arial, sans-serif;">{{ job.company }}{% if job.location %}, {{ job.location }}{% endif %}</div>
+        {% if job.bullets and job.bullets|length > 0 %}
+        <ul style="margin: 6px 0 0; padding-left: 18px; color:#1e293b;">
+          {% for bullet in job.bullets %}<li style="margin-bottom:2px;">{{ bullet }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- PUBLICATIONS: prominent in academic CV -->
+  {% if publications and publications|length > 0 %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Publications</div>
+    <ol style="margin:0; padding-left:18px; color:#1e293b;">
+      {% for pub in publications %}
+      <li style="margin-bottom: 6px;">{{ pub }}</li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+
+  <!-- RESEARCH PROJECTS -->
+  {% if projects and projects|length > 0 %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Research &amp; Projects</div>
+    {% for project in projects %}
+    <div style="margin-bottom: 10px;">
+      <div style="font-weight: 700; color:#0f172a; font-family: Arial, sans-serif;">{{ project.name }}</div>
+      {% if project.description %}<div style="color:#334155; font-style:italic; margin-top:2px;">{{ project.description }}</div>{% endif %}
+      {% if project.bullets and project.bullets|length > 0 %}
+      <ul style="margin:4px 0 0; padding-left:18px; color:#1e293b;">
+        {% for bullet in project.bullets %}<li style="margin-bottom:2px;">{{ bullet }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- HONOURS & AWARDS -->
+  {% if awards and awards|length > 0 %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Honours &amp; Awards</div>
+    <ul style="margin:0; padding-left:18px; color:#1e293b;">
+      {% for award in awards %}<li style="margin-bottom:3px;">{{ award }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- CERTIFICATIONS / PROFESSIONAL DEVELOPMENT -->
+  {% if certifications and certifications|length > 0 %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Professional Development</div>
+    <ul style="margin:0; padding-left:18px; color:#1e293b;">
+      {% for cert in certifications %}
+      <li style="margin-bottom:4px;">
+        {{ cert.name }}{% if cert.issuer %} — <span style="color:#475569;">{{ cert.issuer }}</span>{% endif %}{% if cert.year %} <span style="color:#64748b;">({{ cert.year }})</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- PATENT (from additional_sections) -->
+  {% if additional_sections and additional_sections.get('Patent') %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Patent</div>
+    <ul style="margin:0; padding-left:18px; color:#1e293b;">
+      {% for item in additional_sections['Patent'] %}<li style="margin-bottom:3px;">{{ item }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- MEMBERSHIPS (from additional_sections) -->
+  {% if additional_sections and additional_sections.get('Memberships') %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Memberships</div>
+    <ul style="margin:0; padding-left:18px; color:#1e293b;">
+      {% for item in additional_sections['Memberships'] %}<li style="margin-bottom:3px;">{{ item }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- SKILLS -->
+  {% if skills %}
+  <div style="margin-bottom: 16px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Skills</div>
+    {% for category, skills_list in skills.items() %}
+      {% if skills_list and skills_list|length > 0 %}
+      <div style="margin-bottom: 4px; color:#1e293b; font-family: Arial, sans-serif;"><b>{{ category }}:</b> {{ skills_list | join(", ") }}</div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- LANGUAGES -->
+  {% if languages and languages|length > 0 %}
+  <div style="margin-bottom: 8px;">
+    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color:#0f172a; font-family: Arial, sans-serif; border-bottom: 1px solid #94a3b8; padding-bottom: 4px; margin-bottom: 8px;">Languages</div>
+    <div style="color:#1e293b; font-family: Arial, sans-serif;">
+      {% for lang in languages %}{{ lang.language }}{% if lang.proficiency %} ({{ lang.proficiency }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>

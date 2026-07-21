@@ -1,0 +1,100 @@
+AnchorCV — Product Demo Voiceover Script
+Total runtime: 2 min 03 sec
+Speaking pace: ~130 words/min (natural, confident tone)
+=========================================================
+
+[SCENE 1 — INTRO]  0:00 – 0:07  (~15 words)
+─────────────────────────────────────────────
+"This is AnchorCV — the AI-powered application toolkit built for
+international students and job seekers worldwide."
+
+─────────────────────────────────────────────
+[SCENE 2 — THE PROBLEM]  0:07 – 0:15  (~20 words)
+─────────────────────────────────────────────
+"Every application is a grind. Copy your CV, open ChatGPT, paste,
+fix the generic output, and repeat. Twenty jobs? That's five hours
+wasted — every single time."
+
+─────────────────────────────────────────────
+[SCENE 3 — ANALYSIS TAB TOUR]  0:15 – 0:30  (~38 words)
+─────────────────────────────────────────────
+"AnchorCV does all of that in one platform. The Analysis tab lets
+you choose exactly what to generate. Application Strategy builds
+your full action plan. ATS Score finds missing keywords. Job Match
+Score shows your percentage fit. Cover Letter and Professor Email
+write the message for you — in seconds."
+
+─────────────────────────────────────────────
+[SCENE 4 — BUILDER TAB TOUR]  0:30 – 0:45  (~36 words)
+─────────────────────────────────────────────
+"The CV Builder gives you complete control. Choose from four
+formats: ATS-Optimised, Europass, Academic, or One-page. Pick the
+language — English, Spanish, French, German, or Arabic. Set the
+tone, adjust the length, and choose which sections to include.
+Export as PDF or DOCX."
+
+─────────────────────────────────────────────
+[SCENE 5 — WORKFLOW OVERVIEW]  0:45 – 0:53  (~20 words)
+─────────────────────────────────────────────
+"Here's what makes AnchorCV different. Generate the strategy once
+— then reuse it everywhere. The analysis flows directly into the
+builder, with no copy-pasting."
+
+─────────────────────────────────────────────
+[SCENE 6 — LIVE ANALYSIS DEMO]  0:53 – 1:10  (~42 words)
+─────────────────────────────────────────────
+"Upload your CV, paste the job requirements, select Application
+Strategy, and hit Generate. AnchorCV reads your real experience,
+matches it against what the role requires, identifies the gaps,
+and builds a personalised action plan — not a generic template.
+The whole thing takes about ten seconds."
+
+─────────────────────────────────────────────
+[SCENE 7 — STRATEGY OUTPUT + USE IN BUILDER]  1:10 – 1:23  (~34 words)
+─────────────────────────────────────────────
+"The strategy gives you a Fit Score, shows exactly what you already
+have, flags the critical gaps, and lays out a four-week plan. Click
+'Use in CV Builder' — and everything flows straight into the builder
+automatically."
+
+─────────────────────────────────────────────
+[SCENE 8 — CV BUILDER WITH STRATEGY]  1:23 – 1:38  (~38 words)
+─────────────────────────────────────────────
+"In the Builder, the strategy becomes your guidance. Select your
+format, tone, and language. Add or remove sections with one click.
+Hit Build CV — and the preview updates instantly, ready to export
+as a fully tailored PDF or DOCX file."
+
+─────────────────────────────────────────────
+[SCENE 9 — CHROME EXTENSION]  1:38 – 1:54  (~42 words)
+─────────────────────────────────────────────
+"The Chrome Extension brings the same power to any job site.
+On LinkedIn, Indeed, or JobsDB — click the AnchorCV icon, extract
+the job description in one click, then generate a tailored cover
+letter or professor email. No switching tabs. No copy-pasting.
+Just copy and send."
+
+─────────────────────────────────────────────
+[SCENE 10 — OUTRO]  1:54 – 2:03  (~20 words)
+─────────────────────────────────────────────
+"Analysis, strategy, builder, and Chrome — one complete workflow
+for every application. Nine dollars for three months. Start today
+at anchorcv.com."
+
+=========================================================
+TOTAL WORD COUNT: ~305 words
+ESTIMATED RUNTIME AT 130 WPM: 2 min 20 sec
+NOTE: Slow down slightly on Scenes 3, 4, 6 for breathing room.
+      Pause 0.5s between sentences for natural rhythm.
+=========================================================
+
+RECORDING TIPS:
+• Tone: Confident, clear, slightly warm — not salesy
+• Emphasis words: "one platform", "ten seconds", "one click",
+  "no copy-pasting", "nine dollars"
+• Slight pause before "nine dollars" in the outro for impact
+• Recommended TTS voices if not recording yourself:
+  - ElevenLabs: "Adam" or "Rachel"
+  - Murf.ai: "Marcus" (English, Professional)
+  - Descript Overdub: any neutral American English voice
+=========================================================

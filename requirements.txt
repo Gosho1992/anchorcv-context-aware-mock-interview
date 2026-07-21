@@ -1,0 +1,16 @@
+streamlit
+openai
+pdfplumber
+python-docx
+plotly
+reportlab
+markdown2
+beautifulsoup4
+pillow
+pytesseract
+docxtpl
+supabase>=2.0.0
+gotrue>=2.0.0
+stripe
+bcrypt
+pdfkit

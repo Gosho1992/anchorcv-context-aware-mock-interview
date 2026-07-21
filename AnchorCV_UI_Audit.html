@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>AnchorCV — UI Audit (Current Setup)</title>
+<style>
+  body { font-family: Calibri, Arial, sans-serif; color: #1a1a1a; max-width: 880px; margin: 0 auto; padding: 32px 28px 80px; line-height: 1.55; }
+  h1 { font-size: 30pt; color: #0f172a; border-bottom: 3px solid #6366f1; padding-bottom: 10px; margin-bottom: 6px; }
+  h2 { font-size: 18pt; color: #0f172a; margin-top: 36px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+  h3 { font-size: 13pt; color: #1e293b; margin-top: 22px; }
+  h4 { font-size: 11.5pt; color: #334155; margin-top: 14px; margin-bottom: 4px; }
+  p, li { font-size: 11pt; }
+  code { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 1px 5px; border-radius: 3px; font-family: Consolas, "Courier New", monospace; font-size: 10pt; color: #1e3a5f; }
+  pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 5px; padding: 10px 12px; font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; overflow-x: auto; }
+  .meta { color: #64748b; font-size: 10pt; margin-bottom: 24px; }
+  .callout { background: #fff7ed; border-left: 4px solid #f97316; padding: 12px 14px; margin: 14px 0; border-radius: 0 4px 4px 0; }
+  .callout-good { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 12px 14px; margin: 14px 0; border-radius: 0 4px 4px 0; }
+  .callout-bad { background: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 14px; margin: 14px 0; border-radius: 0 4px 4px 0; }
+  .mock-frame { border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; background: #fafafa; margin: 14px 0; text-align: center; }
+  .mock-caption { font-size: 9.5pt; color: #64748b; font-style: italic; margin-top: 6px; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 10.5pt; }
+  th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; color: #1e3a5f; font-weight: 700; }
+  .sev-high { background: #fef2f2; }
+  .sev-med { background: #fff7ed; }
+  .sev-low { background: #f8fafc; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 9pt; font-weight: 700; letter-spacing: 0.04em; }
+  .pill-h { background: #fee2e2; color: #b91c1c; }
+  .pill-m { background: #ffedd5; color: #c2410c; }
+  .pill-l { background: #e0e7ff; color: #3730a3; }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  .toc li { margin-bottom: 2px; }
+  .small { font-size: 10pt; color: #475569; }
+</style>
+</head>
+<body>
+
+<h1>AnchorCV — UI Audit (Current Setup)</h1>
+<p class="meta">
+  Prepared for: Gosho (zainzia1992@gmail.com) &middot; Date: 4 May 2026 &middot;
+  Last updated: 6 May 2026 &middot;
+  Source: <code>C:\Users\SiliCon\Downloads\ANCHOR CV\anchorcv-frontend\</code> &middot;
+  Scope: Audit of the current production UI. Section 5.10 covers the Discovery feature added in May 2026.
+</p>
+
+<h2>Table of contents</h2>
+<ol class="toc">
+  <li>Executive summary</li>
+  <li>Technical foundation</li>
+  <li>Visual design system (what actually exists)</li>
+  <li>Onboarding (the missing layer)</li>
+  <li>Page-by-page audit, with mockups
+    <ul>
+      <li>5.1 Login / Register</li>
+      <li>5.2 Payment</li>
+      <li>5.3 Payment success</li>
+      <li>5.4 Dashboard</li>
+      <li>5.5 Resume Intelligence (Analysis)</li>
+      <li>5.6 CV Builder</li>
+      <li>5.7 My Files</li>
+      <li>5.8 Account</li>
+      <li>5.9 Loading &amp; error states (cross-cutting)</li>
+      <li>5.10 Discovery <span style="background:#dcfce7;color:#166534;padding:1px 8px;border-radius:999px;font-size:9pt;font-weight:700">NEW &middot; May 2026</span></li>
+    </ul>
+  </li>
+  <li>Cross-cutting issues
+    <ul>
+      <li>6.1 Information architecture &amp; navigation</li>
+      <li>6.2 Mobile &amp; responsive</li>
+      <li>6.3 Accessibility</li>
+      <li>6.4 Brand identity</li>
+      <li>6.5 Empty states</li>
+      <li>6.6 Forms &amp; inputs</li>
+      <li>6.7 Error handling</li>
+      <li>6.8 Animation &amp; motion</li>
+      <li>6.9 Tailwind dead weight</li>
+      <li>6.10 Copy &amp; tone</li>
+    </ul>
+  </li>
+  <li>Prioritized findings table</li>
+  <li>Quick wins (1 week of work)</li>
+  <li>Bigger questions to answer before any redesign</li>
+</ol>
+
+<!-- =================================================================== -->
+<h2>1. Executive summary</h2>
+
+<p>
+The AnchorCV web app is functional, the data model is solid, and the loading-state copy has more personality than most products.
+The reason it feels "boring and difficult to use" is not one big problem — it's the accumulation of about a dozen small decisions, almost all fixable without changing the underlying React architecture.
+</p>
+
+<p>The top-level findings are:</p>
+
+<ul>
+  <li><strong>There is no onboarding.</strong> A first-time user signs up, is sent straight to a payment page, then dropped onto a dashboard with four identical-looking text cards and no instruction on what to do next. The product has no first-run flow, no example CV, no "try it once" path, no tooltips, no progress indicator across steps.</li>
+  <li><strong>The visual design is generic 2023 SaaS dark mode.</strong> Indigo gradients on dark navy, Georgia serif headings, "AI-powered" tagline, no imagery, no illustrations, no logo mark beyond a generic anchor SVG, no animation other than a spinning gear emoji. Nothing on the screen tells you it's <em>this</em> product and not one of fifty interchangeable resume tools.</li>
+  <li><strong>The two core features (Analysis and Builder) overlap and compete.</strong> Both ask the user to upload a CV and paste a job description. Both produce a result on the right of a 2-column layout. New users have no way to know which one they should do first, or whether they need both.</li>
+  <li><strong>Inline styles fight the CSS.</strong> About 40% of the visual styling lives in inline <code>style={{ ... }}</code> blocks, not in <code>globals.css</code>. The Dashboard's premium card, the Payment Success extension prompt, the Analysis page's score circles and badges, and several others use ad-hoc colors and corner radii that don't match the rest of the app. This is the reason it looks visually inconsistent even though the components are individually fine.</li>
+  <li><strong>The app's idea of "premium" is invisible until you click around.</strong> Pricing is never shown. The cost ($9? $29?), what you get, how long it lasts (90 days, hidden in the code), and what "Premium" unlocks vs. the free tier — none of this is on the marketing surface. The Payment page just says "Complete payment to unlock the app" with a button.</li>
+  <li><strong>Tailwind is installed but not used.</strong> <code>tailwind.config.js</code> is present, postcss is configured, but no JSX file uses Tailwind utility classes. All styling is either custom CSS in <code>globals.css</code> or inline. This is dead weight and a maintenance trap (whoever joins the team will assume Tailwind classes exist).</li>
+  <li><strong>Errors use <code>window.alert()</code> in three places</strong> (FilesPage, Analysis save, Builder save). Native browser alert dialogs are the most jarring UX you can ship in 2026.</li>
+  <li><strong>The Files page renders a literal replacement character.</strong> Line 105 of <code>FilesPage.jsx</code>: <code>{Math.round(...)} KB &#xFFFD; {formatFileDate(...)}</code> &mdash; a corrupted bullet separator. Every file row shows a black diamond with a question mark.</li>
+</ul>
+
+<p>
+The good news: the React component model, Zustand store, TanStack Query usage, and routing are all clean.
+The audit below is about <em>presentation, copy, flow, and polish</em>, not architecture. None of the issues require rewriting the data layer.
+</p>
+
+<!-- =================================================================== -->
+<h2>2. Technical foundation</h2>
+
+<table>
+  <tr><th>Concern</th><th>Current state</th></tr>
+  <tr><td>Framework</td><td>React 18 + Vite 6, JSX (no TypeScript)</td></tr>
+  <tr><td>Routing</td><td>react-router-dom v6, declared in <code>App.jsx</code>, with <code>ProtectedRoute</code> wrapping authenticated and premium-gated routes</td></tr>
+  <tr><td>State</td><td>Zustand for auth (<code>useAuthStore</code>) and CV workspace (<code>useCvWorkspaceStore</code>); TanStack Query for server data (files, mutations)</td></tr>
+  <tr><td>Styling</td><td>Single global stylesheet (<code>src/styles/globals.css</code>, ~320 lines, hand-written CSS variables) + heavy use of inline <code>style={{ ... }}</code> blocks per component. Tailwind installed but unused.</td></tr>
+  <tr><td>Icons</td><td>One inline SVG anchor icon in the sidebar; everywhere else, emoji characters (&#x1F9E9;, &#x2705;, &#x2699;, &#x1F389;, &#x1F4A1;) are used as icons</td></tr>
+  <tr><td>Fonts</td><td>System: <code>Segoe UI</code> for body; <code>Georgia, serif</code> for titles. No webfont loaded.</td></tr>
+  <tr><td>HTML head</td><td>Bare: title only. No favicon, no meta description, no OG tags, no theme-color, no preconnect.</td></tr>
+  <tr><td>Pages</td><td>8 page components (<code>LoginPage</code>, <code>PaymentPage</code>, <code>PaymentSuccessPage</code>, <code>DashboardPage</code>, <code>AnalysisPage</code>, <code>BuilderPage</code>, <code>FilesPage</code>, <code>AccountPage</code>)</td></tr>
+  <tr><td>Shared components</td><td><code>Layout</code> (sidebar shell), <code>ProtectedRoute</code>, <code>FileDropzone</code>, <code>FormatCard</code> &mdash; that's it.</td></tr>
+</table>
+
+<p class="small">
+  No design tokens beyond the 9 CSS custom properties in <code>:root</code>. No spacing scale (rem values are scattered: <code>0.5rem, 0.55rem, 0.65rem, 0.7rem, 0.75rem, 0.8rem, 0.85rem</code> all appear). No border-radius scale (values used: <code>8px, 10px, 12px, 14px, 18px, 24px, 999px</code> &mdash; six different scales for "rounded corners").
+</p>
+
+<!-- =================================================================== -->
+<h2>3. Visual design system (what actually exists)</h2>
+
+<h3>3.1 Color</h3>
+<table>
+  <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+  <tr><td><code>--bg</code></td><td>#08111f</td><td>Page background base</td></tr>
+  <tr><td><code>--bg-alt</code></td><td>#122035</td><td>Declared but barely used</td></tr>
+  <tr><td><code>--panel</code></td><td>rgba(10,18,35,.86)</td><td>Card backgrounds</td></tr>
+  <tr><td><code>--border</code></td><td>rgba(141,170,219,.18)</td><td>All borders</td></tr>
+  <tr><td><code>--text</code></td><td>#f5f7fb</td><td>Body text</td></tr>
+  <tr><td><code>--muted</code></td><td>#9eb0cf</td><td>Secondary text</td></tr>
+  <tr><td><code>--accent</code></td><td>#6366f1</td><td>Primary actions</td></tr>
+  <tr><td><code>--accent-soft</code></td><td>#c7d2fe</td><td>Eyebrow labels</td></tr>
+</table>
+
+<p>That is the official palette. In practice the codebase also uses, inline:</p>
+<ul>
+  <li><strong>Teal</strong> #0d9488 / rgba(13,148,136,*) for the Chrome-extension premium card on the Dashboard and the "Add to Chrome" buttons</li>
+  <li><strong>Slate</strong> #94a3b8, #64748b, #1e293b, #cbd5e1, #e2e8f0 in dozens of places (the entire Tailwind slate ramp by hex)</li>
+  <li><strong>Status</strong> reds #ef4444 / #fca5a5, ambers #f59e0b / #fde68a, greens #22c55e / #bbf7d0 &mdash; all hard-coded inline in <code>AnalysisPage.jsx</code></li>
+  <li><strong>White preview backgrounds</strong> #ffffff for the result panel and CV preview iframe (jarring against the dark shell, but unavoidable for printable output)</li>
+</ul>
+
+<div class="callout">
+  Net effect: the eye sees four palettes &mdash; navy/indigo (chrome), teal (premium), slate (text), and white (previews). It feels like four different products were stitched together.
+</div>
+
+<h3>3.2 Typography</h3>
+<ul>
+  <li><strong>Body:</strong> "Segoe UI", sans-serif &mdash; system font, renders as Helvetica on macOS, falls back to default sans on Linux. No explicit weight scale.</li>
+  <li><strong>Titles:</strong> Georgia, serif (<code>.page-title, .brand-title</code>) &mdash; an unusual choice that gives the brand a slightly editorial feel but clashes with the techy indigo gradient.</li>
+  <li><strong>Eyebrow labels:</strong> 0.78rem uppercase with 0.12em letter-spacing &mdash; nice, used consistently.</li>
+  <li><strong>No type scale</strong>. Font sizes used inline include 13px, 14px, 15px, 16px, 0.72rem, 0.78rem, 0.8rem, 0.82rem, 0.85rem, 0.88rem, 0.95rem, 1rem, 1.5rem, 2.5rem, "page-title" (no explicit size). At least eight different "smallish" sizes coexist.</li>
+</ul>
+
+<h3>3.3 Components in use</h3>
+<table>
+  <tr><th>Class</th><th>Where it&rsquo;s defined</th><th>Notes</th></tr>
+  <tr><td><code>.panel</code> / <code>.hero-panel</code> / <code>.auth-panel</code></td><td>globals.css</td><td>The card primitive. 24px border-radius, blurred dark background, soft shadow. Consistent.</td></tr>
+  <tr><td><code>.primary-button</code></td><td>globals.css</td><td>Indigo gradient pill. Used everywhere&hellip; except on the Dashboard&rsquo;s Chrome extension card and the Payment Success card, which roll their own teal pill with 8px radius.</td></tr>
+  <tr><td><code>.secondary-button</code></td><td>globals.css</td><td>Subtle gray pill, consistent.</td></tr>
+  <tr><td><code>.dropzone</code></td><td>globals.css</td><td>Used by FileDropzone. Looks like a card, not actually a drop zone &mdash; doesn&rsquo;t accept drag-and-drop, just wraps a native <code>&lt;input type="file"&gt;</code> in a styled label. The name is misleading.</td></tr>
+  <tr><td><code>.format-card</code></td><td>globals.css + inline</td><td>Used by FormatCard. Selected state changes background &mdash; hard to spot.</td></tr>
+  <tr><td><code>.meter</code> / <code>.meter-fill</code></td><td>globals.css</td><td>Storage usage bar. 12px tall, indigo gradient. Only used on the Account page.</td></tr>
+  <tr><td><code>.segmented-control</code></td><td>globals.css</td><td>Login/Register toggle. Pill segmented. Active state is subtle.</td></tr>
+  <tr><td><code>.preview-panel</code> / <code>.preview-frame</code></td><td>globals.css</td><td>White result containers, both 70vh tall.</td></tr>
+  <tr><td><code>.preview-toggle-panel</code></td><td>globals.css</td><td>Wraps <code>&lt;details&gt;</code> for "show more" toggles. Small but consistent.</td></tr>
+</table>
+
+<p>
+There is <strong>no</strong> reusable: notification toast, modal, tooltip, dropdown menu, tab, accordion, table component, badge component, progress stepper, skeleton loader, avatar, input with built-in label/error, or icon system.
+</p>
+
+<!-- =================================================================== -->
+<h2>4. Onboarding (the missing layer)</h2>
+
+<p>This is the single biggest gap. Below is the actual first-time user journey, traced through the code:</p>
+
+<ol>
+  <li><strong>Lands on /login</strong> &mdash; sees a card with two tabs (Login / Register). No marketing context. No screenshot of the product. No price. No "what is this?" Just a form.</li>
+  <li><strong>Clicks Register</strong>, fills first name, last name, country (free text input), email, password. No password strength meter, no email verification, no Terms-of-Service checkbox.</li>
+  <li><strong>Submits</strong>. Backend creates the row. Frontend immediately calls <code>navigate("/payment", { autoStartCheckout: true })</code> &mdash; meaning the user is bounced straight to Lemon Squeezy without ever seeing the app.</li>
+  <li><strong>Pays</strong>. Comes back to <code>/payment-success</code>, sees a "&#x1F389; Premium Activated!" card with a 10-second auto-redirect countdown and one CTA: "Add Chrome Extension".</li>
+  <li><strong>Lands on /</strong> (Dashboard). Sees:
+    <ul>
+      <li>"Welcome back, &lt;FirstName&gt;." (lying &mdash; this is the first visit)</li>
+      <li>A teal "Chrome Extension &mdash; Premium Active" card with one CTA</li>
+      <li>Four identical-looking text cards: Resume Intelligence / CV Builder / My Files / Account &amp; Billing</li>
+    </ul>
+    No instruction on which to click. No "Step 1 / Step 2". No example CV. No empty-state nudge.
+  </li>
+  <li><strong>Clicks "Resume Intelligence"</strong> (a guess), arrives at Analysis page. Two empty file dropzones, a select with 6 cryptic options ("Application Strategy", "ATS Score &amp; Keywords"&hellip;), a textarea, a button. No explanation of what each output type does or which to pick first.</li>
+</ol>
+
+<div class="callout-bad">
+  <strong>Net result:</strong> a paying user gets onto the dashboard knowing two things &mdash; that they spent money, and that there&rsquo;s a Chrome extension. They don&rsquo;t know what the app does, in what order, or how to get their first useful output. This is the source of the "difficult to use" feedback.
+</div>
+
+<h4>What the codebase has (or doesn&rsquo;t) for onboarding</h4>
+<ul>
+  <li>No tour library (e.g., react-joyride, intro.js, shepherd.js) installed</li>
+  <li>No "first time?" flag stored on the user (no <code>onboarded_at</code>, no <code>has_completed_first_analysis</code>)</li>
+  <li>No checklist component anywhere</li>
+  <li>No sample/demo data path &mdash; you cannot preview the analysis without uploading a real CV first</li>
+  <li>No "?" help icons, no tooltips, no contextual hints</li>
+</ul>
+
+<!-- =================================================================== -->
+<h2>5. Page-by-page audit, with mockups</h2>
+
+<p class="small">
+  The mockups below are SVG renderings derived directly from the JSX and CSS in the repository &mdash; same colors, same typography hierarchy, same component placement. They are approximate (no live data) but accurately represent the layout and visual feel the user experiences today.
+</p>
+
+<!-- ---------------- 5.1 Login ---------------- -->
+<h3>5.1 Login / Register &mdash; <code>src/pages/LoginPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:760px">
+  <defs>
+    <radialGradient id="bg1" cx="0" cy="0" r="0.6"><stop offset="0" stop-color="#818cf8" stop-opacity="0.22"/><stop offset="1" stop-color="#08111f" stop-opacity="0"/></radialGradient>
+    <radialGradient id="bg2" cx="1" cy="1" r="0.55"><stop offset="0" stop-color="#6366f1" stop-opacity="0.18"/><stop offset="1" stop-color="#08111f" stop-opacity="0"/></radialGradient>
+    <linearGradient id="btn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+  </defs>
+  <rect width="760" height="480" fill="#08111f"/>
+  <rect width="760" height="480" fill="url(#bg1)"/>
+  <rect width="760" height="480" fill="url(#bg2)"/>
+  <!-- card -->
+  <rect x="160" y="40" width="440" height="400" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="190" y="80" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">&#x2693; ANCHORCV</text>
+  <text x="190" y="118" font-family="Georgia" font-size="26" fill="#f5f7fb">Welcome back.</text>
+  <text x="190" y="146" font-family="Segoe UI" font-size="12" fill="#9eb0cf">Your AI-powered CV builder for international students.</text>
+  <!-- segmented -->
+  <rect x="190" y="170" width="180" height="36" rx="999" fill="rgba(99,102,241,0.18)"/>
+  <rect x="370" y="170" width="180" height="36" rx="999" fill="rgba(255,255,255,0.05)"/>
+  <text x="262" y="193" font-family="Segoe UI" font-size="13" fill="#f5f7fb" text-anchor="middle">Login</text>
+  <text x="460" y="193" font-family="Segoe UI" font-size="13" fill="#f5f7fb" text-anchor="middle">Register</text>
+  <!-- inputs -->
+  <rect x="190" y="226" width="380" height="42" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="204" y="252" font-family="Segoe UI" font-size="12" fill="#64748b">Email</text>
+  <rect x="190" y="280" width="380" height="42" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="204" y="306" font-family="Segoe UI" font-size="12" fill="#64748b">Password</text>
+  <!-- button -->
+  <rect x="190" y="346" width="380" height="46" rx="999" fill="url(#btn)"/>
+  <text x="380" y="374" font-family="Segoe UI" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Sign in</text>
+</svg>
+<div class="mock-caption">Login page (mocked from JSX). The card is centered on a dark background with two soft indigo radial gradients.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>Card is correctly centered, breathable padding, clear hierarchy.</li>
+  <li>Segmented control for login/register is the right pattern for a small app.</li>
+  <li>Error normalisation (<code>getReadableError</code>) handles weird FastAPI 422 response shapes correctly.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>Zero marketing context.</strong> A first-time visitor sees only a form. No sentence about what AnchorCV does, what it costs, what makes it different. Compare to e.g. Notion&rsquo;s login &mdash; even <em>their</em> minimal login page has product collateral on the side.</li>
+  <li><strong>Country is a free-text input.</strong> Should be a select. The backend uses it to set Lemon Squeezy billing context, so a typo could break tax handling.</li>
+  <li><strong>No password show/hide toggle.</strong></li>
+  <li><strong>No "Forgot password?" link.</strong> If the backend doesn&rsquo;t support reset (and from the auth router, it doesn&rsquo;t), this is a real liability &mdash; users <em>will</em> forget passwords, especially after a 90-day premium gap.</li>
+  <li><strong>No social login.</strong> Google sign-in alone would remove the registration-form barrier for ~70% of international students who already have a Google account.</li>
+  <li><strong>No Terms-of-Service / Privacy checkbox.</strong> Required in EU and increasingly elsewhere.</li>
+  <li><strong>Eyebrow uses a single anchor emoji <code>⚓</code> as the brand mark</strong> &mdash; renders inconsistently across platforms (sometimes outlined, sometimes blue, sometimes a shipping container).</li>
+  <li><strong>Same screen handles login and register.</strong> The register variant adds three inputs (first name, last name, country) but the title still says "Welcome back." &mdash; copy never updates for new users.</li>
+</ul>
+
+<!-- ---------------- 5.2 Payment ---------------- -->
+<h3>5.2 Payment &mdash; <code>src/pages/PaymentPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:760px">
+  <rect width="760" height="360" fill="#08111f"/>
+  <rect x="160" y="40" width="440" height="280" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="190" y="80" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">ANCHORCV PREMIUM</text>
+  <text x="190" y="116" font-family="Georgia" font-size="22" fill="#f5f7fb">Complete payment to unlock the app.</text>
+  <text x="190" y="160" font-family="Segoe UI" font-size="12" fill="#9eb0cf">Your account has been created for gosho@example.com.</text>
+  <text x="190" y="180" font-family="Segoe UI" font-size="12" fill="#9eb0cf">Premium gives you full dashboard access for 90 days.</text>
+  <rect x="190" y="220" width="380" height="46" rx="999" fill="url(#btn)"/>
+  <text x="380" y="248" font-family="Segoe UI" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Continue to Lemon Squeezy checkout</text>
+</svg>
+<div class="mock-caption">Payment page. One headline, one subline, one button. No price, no feature list, no testimonial.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>Auto-redirect to Lemon Squeezy when arriving via the register flow (<code>state.autoStartCheckout</code>) &mdash; fewer clicks for new users.</li>
+  <li>Button is disabled while redirecting, giving visual feedback.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>The price is invisible.</strong> Nowhere in the JSX (or the dashboard, or the login page) does the user see a dollar amount before they are sent to Lemon Squeezy.</li>
+  <li><strong>No feature comparison.</strong> "Premium gives you full dashboard access for 90 days" doesn&rsquo;t say <em>vs. what</em>. There&rsquo;s no free tier described, so the message reads as "pay to use the app at all" &mdash; which is actually accurate but a hard sell.</li>
+  <li><strong>No social proof, money-back guarantee, or risk reversal.</strong> No testimonials, no "join 1,000+ students", no refund policy.</li>
+  <li><strong>"90 days" is buried in microcopy.</strong> Users will likely interpret this as "subscription" rather than "one-time access".</li>
+  <li><strong>The CTA name leaks the payment vendor.</strong> "Continue to Lemon Squeezy checkout" &mdash; users have never heard of Lemon Squeezy and the brand intrusion makes the moment feel less polished. "Continue to secure checkout" would be cleaner.</li>
+</ul>
+
+<!-- ---------------- 5.3 Payment success ---------------- -->
+<h3>5.3 Payment success &mdash; <code>src/pages/PaymentSuccessPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:760px">
+  <rect width="760" height="480" fill="#08111f"/>
+  <rect x="160" y="30" width="440" height="420" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="380" y="90" font-family="Segoe UI" font-size="44" text-anchor="middle">&#x1F389;</text>
+  <text x="380" y="116" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe" text-anchor="middle">PAYMENT SUCCESSFUL</text>
+  <text x="380" y="148" font-family="Georgia" font-size="22" fill="#f5f7fb" text-anchor="middle">Premium Activated!</text>
+  <text x="380" y="174" font-family="Segoe UI" font-size="12" fill="#9eb0cf" text-anchor="middle">You now have full access to AnchorCV including the Chrome Extension.</text>
+  <!-- ext card -->
+  <rect x="190" y="206" width="380" height="160" rx="14" fill="rgba(13,148,136,0.12)" stroke="rgba(13,148,136,0.45)"/>
+  <text x="206" y="232" font-family="Segoe UI" font-size="13" font-weight="700" fill="#e2e8f0">&#x1F9E9; Install the Chrome Extension</text>
+  <text x="206" y="258" font-family="Segoe UI" font-size="11" fill="#94a3b8">Generate tailored cover letters and professor emails in</text>
+  <text x="206" y="274" font-family="Segoe UI" font-size="11" fill="#94a3b8">one click &mdash; directly on LinkedIn, Indeed, and JobsDB.</text>
+  <rect x="206" y="298" width="160" height="38" rx="8" fill="#0d9488"/>
+  <text x="286" y="322" font-family="Segoe UI" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Add to Chrome &rarr;</text>
+  <text x="380" y="402" font-family="Segoe UI" font-size="11" fill="#64748b" text-anchor="middle">Redirecting in 7s&hellip;  Go now</text>
+</svg>
+<div class="mock-caption">Payment success page. Auto-redirects after 10 seconds.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>Optimistic local update: even before the backend webhook fires, the local user state flips <code>is_premium=true</code> so the next page already trusts it.</li>
+  <li>Auto-redirect with manual "Go now" escape &mdash; correct UX pattern.</li>
+  <li>The Chrome extension card is the right place to put this prompt &mdash; the user&rsquo;s motivation is highest right after they&rsquo;ve paid.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>The teal extension card is the only thing on screen,</strong> so a user who doesn&rsquo;t want the extension feels like the page wasn&rsquo;t built for them. There&rsquo;s no "Or jump to your dashboard" alternative CTA at the same visual weight.</li>
+  <li><strong>The Chrome extension card uses 8px corner radius and 14px font,</strong> while everything else in the app uses 14&ndash;24px radius and 13/15/16px text. It looks like a foreign component.</li>
+  <li><strong>Confetti emoji as the celebration moment.</strong> Functional, but a tiny bit of CSS animation (a checkmark drawing in, or a single confetti burst) would make this moment land emotionally.</li>
+  <li><strong>No receipt link, no order ID, no "Email confirmation sent to&hellip;" reassurance.</strong> Payment-success pages should always confirm the transaction in writing.</li>
+</ul>
+
+<!-- ---------------- 5.4 Dashboard ---------------- -->
+<h3>5.4 Dashboard &mdash; <code>src/pages/DashboardPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 980 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:980px">
+  <rect width="980" height="580" fill="#08111f"/>
+  <!-- sidebar -->
+  <rect x="0" y="0" width="280" height="580" fill="rgba(4,9,17,0.75)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="32" y="46" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">&#x2693; ANCHORCV</text>
+  <text x="32" y="80" font-family="Georgia" font-size="22" fill="#f5f7fb">AnchorCV</text>
+  <text x="32" y="104" font-family="Segoe UI" font-size="11" fill="#9eb0cf">AI-powered CV builder for</text>
+  <text x="32" y="118" font-family="Segoe UI" font-size="11" fill="#9eb0cf">international students.</text>
+  <!-- nav items -->
+  <rect x="20" y="150" width="240" height="40" rx="14" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <text x="40" y="174" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Dashboard</text>
+  <text x="40" y="218" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Analysis</text>
+  <text x="40" y="252" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Builder</text>
+  <text x="40" y="286" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Files</text>
+  <text x="40" y="320" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Account</text>
+  <!-- account card -->
+  <rect x="20" y="450" width="240" height="110" rx="14" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="32" y="474" font-family="Segoe UI" font-size="10" letter-spacing="2" fill="#c7d2fe">SIGNED IN</text>
+  <text x="32" y="496" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">Gosho Zia</text>
+  <text x="32" y="514" font-family="Segoe UI" font-size="10" fill="#9eb0cf">zainzia1992@gmail.com</text>
+  <rect x="32" y="528" width="100" height="26" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="82" y="546" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">Sign out</text>
+  <!-- main -->
+  <!-- hero -->
+  <rect x="310" y="30" width="640" height="100" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="60" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">DASHBOARD</text>
+  <text x="332" y="88" font-family="Georgia" font-size="22" fill="#f5f7fb">Welcome back, Gosho.</text>
+  <text x="332" y="110" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Your AI-powered career toolkit. Build ATS-optimised CVs, analyse job fit, and manage your documents.</text>
+  <!-- premium card (active state) -->
+  <rect x="310" y="146" width="640" height="76" rx="14" fill="rgba(13,148,136,0.12)" stroke="rgba(13,148,136,0.45)"/>
+  <rect x="332" y="166" width="40" height="40" rx="10" fill="rgba(13,148,136,0.2)"/>
+  <text x="352" y="192" font-family="Segoe UI" font-size="20" text-anchor="middle">&#x1F9E9;</text>
+  <text x="384" y="180" font-family="Segoe UI" font-size="13" font-weight="700" fill="#e2e8f0">Chrome Extension &mdash; Premium Active &#x2705;</text>
+  <text x="384" y="198" font-family="Segoe UI" font-size="11" fill="#94a3b8">Generate cover letters instantly on LinkedIn, Indeed &amp; JobsDB. No copy-pasting needed.</text>
+  <rect x="822" y="170" width="116" height="34" rx="8" fill="#0d9488"/>
+  <text x="880" y="192" font-family="Segoe UI" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Add to Chrome &rarr;</text>
+  <!-- 2x2 cards -->
+  <rect x="310" y="240" width="310" height="140" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="328" y="270" font-family="Segoe UI" font-size="14" font-weight="700" fill="#f5f7fb">Resume Intelligence</text>
+  <text x="328" y="294" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Upload your CV and a job/scholarship</text>
+  <text x="328" y="308" font-family="Segoe UI" font-size="11" fill="#9eb0cf">posting. Get ATS score, gap analysis,</text>
+  <text x="328" y="322" font-family="Segoe UI" font-size="11" fill="#9eb0cf">and tailored improvements.</text>
+  <rect x="640" y="240" width="310" height="140" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="658" y="270" font-family="Segoe UI" font-size="14" font-weight="700" fill="#f5f7fb">CV Builder</text>
+  <text x="658" y="294" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Generate a professional CV in 4 formats:</text>
+  <text x="658" y="308" font-family="Segoe UI" font-size="11" fill="#9eb0cf">ATS, Europass, Academic, or One-page.</text>
+  <rect x="310" y="396" width="310" height="140" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="328" y="426" font-family="Segoe UI" font-size="14" font-weight="700" fill="#f5f7fb">My Files</text>
+  <text x="328" y="450" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Access your saved CVs and documents</text>
+  <text x="328" y="464" font-family="Segoe UI" font-size="11" fill="#9eb0cf">stored securely in the cloud.</text>
+  <rect x="640" y="396" width="310" height="140" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="658" y="426" font-family="Segoe UI" font-size="14" font-weight="700" fill="#f5f7fb">Account &amp; Billing</text>
+  <text x="658" y="450" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Manage your subscription and</text>
+  <text x="658" y="464" font-family="Segoe UI" font-size="11" fill="#9eb0cf">account settings.</text>
+</svg>
+<div class="mock-caption">Dashboard for a premium user. Sidebar nav on the left, hero panel + Chrome extension card + 4 feature cards on the right.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>Sidebar layout collapses cleanly on narrow viewports (one media query at 960px).</li>
+  <li>Premium / non-premium variants of the Chrome extension card are well-handled with one ternary.</li>
+  <li>Cards are full clickable areas (using <code>&lt;Link&gt;</code>), which is the right pattern.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>Welcome message lies on first visit.</strong> "Welcome back" should be "Welcome to AnchorCV" the first time. There&rsquo;s no <code>has_logged_in_before</code> check anywhere.</li>
+  <li><strong>The four cards all look identical.</strong> Same color, same shape, same icon (none). The user can&rsquo;t tell which to click first. They have no visual hierarchy and they don&rsquo;t convey what each does &mdash; the descriptions are the only differentiator.</li>
+  <li><strong>The cards have no icons or imagery.</strong> Even one carefully-chosen emoji per card (or a small SVG glyph) would let the user&rsquo;s eye scan instead of read.</li>
+  <li><strong>Order is wrong.</strong> "Resume Intelligence" comes first &mdash; but the natural first action for most users is to <em>build</em> a CV (or upload one for analysis). Either way, "Account &amp; Billing" should never be a fourth-equal option on the dashboard; it belongs in the sidebar account card or as a small link in the corner.</li>
+  <li><strong>The sidebar shows the brand twice.</strong> Once as eyebrow ("&#x2693; ANCHORCV") and once as Georgia serif h1 ("AnchorCV"). Pick one.</li>
+  <li><strong>No "recent activity" or "your last analysis" widget.</strong> A returning user has no shortcut back to where they left off &mdash; they have to re-navigate.</li>
+  <li><strong>No usage stats on the dashboard.</strong> "You&rsquo;ve generated 3 analyses this week" or "5 days of premium remaining" would give the dashboard a reason to exist beyond being a navigation menu.</li>
+</ul>
+
+<!-- ---------------- 5.5 Analysis ---------------- -->
+<h3>5.5 Resume Intelligence (Analysis) &mdash; <code>src/pages/AnalysisPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 980 640" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:980px">
+  <rect width="980" height="640" fill="#08111f"/>
+  <rect x="0" y="0" width="280" height="640" fill="rgba(4,9,17,0.75)"/>
+  <text x="32" y="46" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">&#x2693; ANCHORCV</text>
+  <text x="32" y="80" font-family="Georgia" font-size="22" fill="#f5f7fb">AnchorCV</text>
+  <rect x="20" y="200" width="240" height="40" rx="14" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <text x="40" y="224" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Analysis</text>
+  <text x="40" y="186" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Dashboard</text>
+  <text x="40" y="262" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Builder</text>
+  <text x="40" y="296" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Files</text>
+  <text x="40" y="330" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Account</text>
+  <!-- hero -->
+  <rect x="310" y="30" width="640" height="80" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="58" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">ANALYSIS</text>
+  <text x="332" y="86" font-family="Georgia" font-size="20" fill="#f5f7fb">Resume Intelligence</text>
+  <!-- left column -->
+  <rect x="310" y="126" width="310" height="490" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <rect x="328" y="146" width="274" height="74" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="340" y="166" font-family="Segoe UI" font-size="9" letter-spacing="2" fill="#c7d2fe">RESUME UPLOAD</text>
+  <text x="340" y="186" font-family="Segoe UI" font-size="12" font-weight="700" fill="#f5f7fb">Choose a resume file</text>
+  <text x="340" y="204" font-family="Segoe UI" font-size="10" fill="#9eb0cf">PDF and DOCX are supported.</text>
+  <rect x="328" y="232" width="274" height="74" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="340" y="252" font-family="Segoe UI" font-size="9" letter-spacing="2" fill="#c7d2fe">JOB / SCHOLARSHIP REQUIREMENTS</text>
+  <text x="340" y="272" font-family="Segoe UI" font-size="12" font-weight="700" fill="#f5f7fb">Choose a resume file</text>
+  <text x="340" y="290" font-family="Segoe UI" font-size="10" fill="#9eb0cf">PDF, DOCX, and TXT are supported.</text>
+  <!-- select -->
+  <rect x="328" y="320" width="274" height="40" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="344" y="346" font-family="Segoe UI" font-size="12" fill="#f5f7fb">Application Strategy &#x25BE;</text>
+  <!-- textarea -->
+  <rect x="328" y="372" width="274" height="120" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="344" y="394" font-family="Segoe UI" font-size="11" fill="#64748b">Paste the job/scholarship requirements&hellip;</text>
+  <!-- buttons -->
+  <rect x="328" y="510" width="160" height="42" rx="999" fill="url(#btn)"/>
+  <text x="408" y="536" font-family="Segoe UI" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Generate output</text>
+  <rect x="498" y="510" width="100" height="42" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="548" y="536" font-family="Segoe UI" font-size="13" fill="#f5f7fb" text-anchor="middle">Clear</text>
+  <!-- right column -->
+  <rect x="640" y="126" width="310" height="490" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="660" y="156" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">Result preview</text>
+  <text x="660" y="182" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Your formatted result will render here.</text>
+</svg>
+<div class="mock-caption">Analysis page (initial state). Sidebar + hero + 2-column form/result layout.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>The two-column form/result layout is the right pattern for this kind of tool.</li>
+  <li>Result is persisted in Zustand, so navigating away and back doesn&rsquo;t lose work.</li>
+  <li>Output type select is conditional &mdash; "Resume Improvement" exposes a fallback questions panel (industry/level/goal) when no JD is supplied.</li>
+  <li>"Save to Cloud" wires together backend PDF export + storage upload, which is genuinely useful.</li>
+  <li>Loading state ("&#x2728; Analysing your CV against the role requirements&hellip;") is the most personable UI moment in the entire app &mdash; cycles through 10 quotes every 3 seconds.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>Six output types in one select with no explanation.</strong> Application Strategy, ATS Score &amp; Keywords, Resume Improvement, Job Match Score, Cover Letter, Email to Professor &mdash; the new user has no way to know which to pick. This screen needs either a stepper, pickable cards (like the Builder uses for formats), or at minimum a tooltip per option.</li>
+  <li><strong>Both file inputs are labeled "Choose a resume file"</strong> regardless of whether the dropzone is for the resume or for the job description. Look at <code>FileDropzone.jsx</code> line 14: the strong text is hard-coded. The eyebrow label changes ("Resume upload" vs "Job / Scholarship Requirements") but the bold "Choose a resume file" string never changes. Confusing.</li>
+  <li><strong>The "dropzone" is not actually a dropzone.</strong> No drag-and-drop handler is bound. The component just wraps a native file input in a styled label. Keep the name <code>FileDropzone</code>, but it needs a real <code>onDrop</code> handler.</li>
+  <li><strong>The result panel hosts AI HTML inside a white card</strong> (<code>preview-panel</code> with <code>background: white</code>), which clashes hard with the surrounding dark theme. There is no "preview / dark / light" toggle.</li>
+  <li><strong>The Mojibake map is a smoking gun.</strong> Lines 10&ndash;19: a hand-curated list of broken UTF-8 patterns (&Atilde;&copy; &rarr; &eacute;, &acirc;&euro;&trade; &rarr; right-quote, etc.). This means the rendered output sometimes shows broken characters before this client-side patch fixes them. The real fix is upstream encoding; this hack masks the symptom.</li>
+  <li><strong>Score circles, badges, banners, and the entire MatchScoreCard are written with inline styles.</strong> The component is 800+ lines long because of this. Would be 300 if extracted into reusable styled components.</li>
+  <li><strong>The "Job Match Score" output renders a totally different React subtree</strong> (<code>MatchScoreCard</code>) than every other output type (which all render <code>dangerouslySetInnerHTML</code>). Two paths through the same screen, two visual languages.</li>
+  <li><strong>"Use in CV Builder" button only appears for 3 of 6 output types.</strong> The decision is buried in <code>showBuilderButton</code> at line 489 &mdash; it&rsquo;s correct but invisible logic that surprises the user.</li>
+</ul>
+
+<!-- ---------------- 5.6 Builder ---------------- -->
+<h3>5.6 CV Builder &mdash; <code>src/pages/BuilderPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 980 700" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:980px">
+  <rect width="980" height="700" fill="#08111f"/>
+  <rect x="0" y="0" width="280" height="700" fill="rgba(4,9,17,0.75)"/>
+  <text x="32" y="46" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">&#x2693; ANCHORCV</text>
+  <rect x="20" y="240" width="240" height="40" rx="14" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <text x="40" y="264" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Builder</text>
+  <text x="40" y="200" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Dashboard</text>
+  <text x="40" y="226" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Analysis</text>
+  <text x="40" y="296" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Files</text>
+  <text x="40" y="322" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Account</text>
+  <!-- hero -->
+  <rect x="310" y="30" width="640" height="80" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="58" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">BUILDER</text>
+  <text x="332" y="86" font-family="Georgia" font-size="20" fill="#f5f7fb">Professional CV Builder</text>
+  <!-- left column -->
+  <rect x="310" y="126" width="310" height="550" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <rect x="328" y="146" width="274" height="64" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="340" y="166" font-family="Segoe UI" font-size="9" letter-spacing="2" fill="#c7d2fe">RESUME UPLOAD</text>
+  <text x="340" y="186" font-family="Segoe UI" font-size="12" font-weight="700" fill="#f5f7fb">Choose a resume file</text>
+  <!-- format cards 2x2 -->
+  <rect x="328" y="222" width="130" height="80" rx="18" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <rect x="340" y="232" width="32" height="14" rx="999" fill="rgba(99,102,241,0.22)"/>
+  <text x="356" y="242" font-family="Segoe UI" font-size="8" font-weight="700" fill="#c7d2fe" text-anchor="middle">ATS</text>
+  <text x="340" y="266" font-family="Segoe UI" font-size="11" font-weight="700" fill="#f5f7fb">ATS-Optimized CV</text>
+  <text x="340" y="282" font-family="Segoe UI" font-size="9" fill="#9eb0cf">Keyword-rich layout for</text>
+  <text x="340" y="294" font-family="Segoe UI" font-size="9" fill="#9eb0cf">applicant tracking.</text>
+  <rect x="472" y="222" width="130" height="80" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="486" y="242" font-family="Segoe UI" font-size="8" font-weight="700" fill="#cbd5e1" text-anchor="start">EU</text>
+  <text x="484" y="266" font-family="Segoe UI" font-size="11" font-weight="700" fill="#f5f7fb">Europass CV</text>
+  <text x="484" y="282" font-family="Segoe UI" font-size="9" fill="#9eb0cf">Structured EU-style</text>
+  <rect x="328" y="314" width="130" height="80" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="340" y="358" font-family="Segoe UI" font-size="11" font-weight="700" fill="#f5f7fb">Academic CV</text>
+  <rect x="472" y="314" width="130" height="80" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="484" y="358" font-family="Segoe UI" font-size="11" font-weight="700" fill="#f5f7fb">One-page CV</text>
+  <!-- target input -->
+  <rect x="328" y="408" width="274" height="36" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="344" y="430" font-family="Segoe UI" font-size="11" fill="#64748b">Target role or program</text>
+  <!-- textarea -->
+  <rect x="328" y="456" width="274" height="80" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="344" y="478" font-family="Segoe UI" font-size="11" fill="#64748b">Paste job requirements&hellip;</text>
+  <!-- 3 selects -->
+  <rect x="328" y="548" width="86" height="32" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="338" y="568" font-family="Segoe UI" font-size="10" fill="#f5f7fb">Professional &#x25BE;</text>
+  <rect x="422" y="548" width="86" height="32" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="432" y="568" font-family="Segoe UI" font-size="10" fill="#f5f7fb">English &#x25BE;</text>
+  <rect x="516" y="548" width="86" height="32" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="526" y="568" font-family="Segoe UI" font-size="10" fill="#f5f7fb">Full &#x25BE;</text>
+  <!-- color + sections + button -->
+  <text x="328" y="606" font-family="Segoe UI" font-size="9" letter-spacing="2" fill="#c7d2fe">ACCENT COLOR</text>
+  <rect x="328" y="614" width="50" height="22" rx="6" fill="#6366f1"/>
+  <rect x="396" y="614" width="120" height="34" rx="999" fill="url(#btn)"/>
+  <text x="456" y="636" font-family="Segoe UI" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Build CV</text>
+  <!-- right preview -->
+  <rect x="640" y="126" width="310" height="550" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="660" y="156" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">Live preview</text>
+  <text x="660" y="182" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Generated HTML preview will appear here after build.</text>
+  <rect x="660" y="206" width="270" height="450" rx="18" fill="#ffffff" stroke="rgba(141,170,219,0.18)"/>
+</svg>
+<div class="mock-caption">Builder page. Two columns: configuration form on the left, white preview frame on the right.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>Format selector cards (<code>FormatCard</code>) are the right pattern &mdash; visual, scannable, with a clear selected state.</li>
+  <li>Live preview as iframe with <code>srcDoc</code> means the generated HTML can&rsquo;t pollute the parent.</li>
+  <li>State persistence across navigation (Zustand) is preserved here too.</li>
+  <li>"Use latest analysis" button to import the Analysis output as Builder guidance is a thoughtful cross-feature link.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>The form is dauntingly long.</strong> Resume upload, format select, target role, requirements textarea, prefill panel, three more selects (tone/language/length), color picker, sections checkboxes, AI enhance checkbox, two buttons. There is no progressive disclosure &mdash; every option is visible the first time.</li>
+  <li><strong>Native HTML <code>&lt;input type="color"&gt;</code></strong> for the accent color picker is one of the ugliest input controls in the browser. Looks different in every OS. Replace with a small palette of preset swatches.</li>
+  <li><strong>Sections checkboxes are unnamed in the JSX</strong> &mdash; they&rsquo;re generated by mapping over <code>Object.entries(sections)</code>, which means whatever the store calls them (likely <code>summary, experience, education, skills</code>&hellip;) shows up verbatim, including capitalisation.</li>
+  <li><strong>Tone select has only 3 options (Professional / Academic / Concise),</strong> language has 7, length has 3 &mdash; but they&rsquo;re three identical-looking selects in a row. No visual cue that one is more important than another.</li>
+  <li><strong>"AI enhance" is a checkbox with no explanation.</strong> What does it do? When should I check it? The user has no way to know.</li>
+  <li><strong>Empty preview shows nothing &mdash; just white space.</strong> A wireframe placeholder (a fake CV silhouette) would tell the user what they&rsquo;re about to get.</li>
+  <li><strong>"Build CV" is the only path forward,</strong> but the form takes ~12 fields. A "use sample data" button to let users see the result in 5 seconds would dramatically lower the friction for first-time use.</li>
+</ul>
+
+<!-- ---------------- 5.7 Files ---------------- -->
+<h3>5.7 My Files &mdash; <code>src/pages/FilesPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 980 460" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:980px">
+  <rect width="980" height="460" fill="#08111f"/>
+  <rect x="0" y="0" width="280" height="460" fill="rgba(4,9,17,0.75)"/>
+  <text x="32" y="46" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">&#x2693; ANCHORCV</text>
+  <rect x="20" y="270" width="240" height="40" rx="14" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <text x="40" y="294" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Files</text>
+  <!-- upload card -->
+  <rect x="310" y="30" width="640" height="120" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="58" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">FILES</text>
+  <text x="332" y="86" font-family="Georgia" font-size="20" fill="#f5f7fb">My Files</text>
+  <rect x="332" y="100" width="200" height="32" rx="6" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="344" y="121" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Choose File   No file chosen</text>
+  <rect x="544" y="100" width="120" height="32" rx="999" fill="url(#btn)"/>
+  <text x="604" y="121" font-family="Segoe UI" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">Upload file</text>
+  <!-- list panel -->
+  <rect x="310" y="166" width="640" height="280" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <!-- file row -->
+  <text x="332" y="210" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">anchorcv-cv-2026-04-30.pdf</text>
+  <text x="332" y="228" font-family="Segoe UI" font-size="11" fill="#9eb0cf">142 KB &#x25A1; 30/4/2026</text>
+  <rect x="690" y="194" width="64" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="722" y="214" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">View</text>
+  <rect x="762" y="194" width="86" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="805" y="214" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">Download</text>
+  <rect x="856" y="194" width="68" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="890" y="214" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">Delete</text>
+  <!-- second row -->
+  <text x="332" y="276" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">anchorcv-analysis-2026-04-29.pdf</text>
+  <text x="332" y="294" font-family="Segoe UI" font-size="11" fill="#9eb0cf">87 KB &#x25A1; 29/4/2026</text>
+  <rect x="690" y="260" width="64" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="722" y="280" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">View</text>
+  <rect x="762" y="260" width="86" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="805" y="280" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">Download</text>
+  <rect x="856" y="260" width="68" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="890" y="280" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">Delete</text>
+</svg>
+<div class="mock-caption">Files page. Native file input, then a flat list of stored files. The square character represents the literal &#xFFFD; replacement character that appears in production.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>List rows are clean: name + size + date on the left, three actions on the right.</li>
+  <li>HTML files are smartly opened via <code>blob URL</code> in a new tab so they render rather than download.</li>
+  <li>TanStack Query handles the file list, refresh on upload, refresh on delete.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>BUG: a literal replacement character (&#xFFFD;) renders as the separator</strong> between size and date. Look at <code>FilesPage.jsx</code> line 105:
+    <pre>{Math.round((storedFile.size_bytes || 0) / 1024)} KB &#xFFFD; {formatFileDate(storedFile.created_at)}</pre>
+    That&rsquo;s a corrupted middle-dot. Replace with <code>&amp;middot;</code> or <code>&middot;</code> or just a hyphen.</li>
+  <li><strong>Native <code>&lt;input type="file"&gt;</code></strong> shows the OS-default "Choose File" button which doesn&rsquo;t match anything else in the app.</li>
+  <li><strong>Delete is destructive and instant &mdash; no confirmation.</strong> One stray click and the file is gone with no undo.</li>
+  <li><strong>No icons.</strong> A PDF, a DOCX, and a TXT all look identical &mdash; the user has to read the extension.</li>
+  <li><strong>No search, no filter, no sort.</strong> Once a user has 30 files, this list becomes unusable.</li>
+  <li><strong>No file type pills</strong> (e.g., a small "PDF" or "DOCX" badge per row), no source pill (e.g., "from Builder" / "from Analysis").</li>
+  <li><strong>Empty state is one passive sentence.</strong> "No files are stored yet." with no "Generate your first CV &rarr;" call to action.</li>
+  <li><strong>Errors fall back to <code>alert()</code></strong> (line 112: <code>.catch((err) =&gt; alert(err.message))</code>).</li>
+</ul>
+
+<!-- ---------------- 5.8 Account ---------------- -->
+<h3>5.8 Account &mdash; <code>src/pages/AccountPage.jsx</code></h3>
+
+<div class="mock-frame">
+<svg viewBox="0 0 980 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:980px">
+  <rect width="980" height="380" fill="#08111f"/>
+  <rect x="0" y="0" width="280" height="380" fill="rgba(4,9,17,0.75)"/>
+  <rect x="20" y="304" width="240" height="40" rx="14" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <text x="40" y="328" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Account</text>
+  <rect x="310" y="30" width="640" height="80" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="58" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">ACCOUNT</text>
+  <text x="332" y="86" font-family="Georgia" font-size="20" fill="#f5f7fb">Profile and quota</text>
+  <rect x="310" y="126" width="640" height="220" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="158" font-family="Segoe UI" font-size="14" font-weight="700" fill="#f5f7fb">Gosho Zia</text>
+  <text x="332" y="178" font-family="Segoe UI" font-size="11" fill="#9eb0cf">zainzia1992@gmail.com</text>
+  <rect x="332" y="208" width="586" height="12" rx="999" fill="rgba(255,255,255,0.08)"/>
+  <rect x="332" y="208" width="186" height="12" rx="999" fill="#6366f1"/>
+  <text x="332" y="240" font-family="Segoe UI" font-size="11" fill="#9eb0cf">32% of storage quota used</text>
+  <text x="332" y="276" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">PREMIUM ACTIVE</text>
+  <text x="332" y="296" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Premium expires: 2/8/2026</text>
+</svg>
+<div class="mock-caption">Account page. That&rsquo;s the entire screen.</div>
+</div>
+
+<h4>What works</h4>
+<ul>
+  <li>Storage meter is the only place that uses the <code>.meter</code> primitive &mdash; visually pleasant.</li>
+  <li>Reuses the same auth + files queries as elsewhere &mdash; no separate API surface.</li>
+</ul>
+
+<h4>What doesn&rsquo;t</h4>
+<ul>
+  <li><strong>This page is dramatically underbuilt.</strong> No "Change password", no "Update email", no "Delete account", no "Cancel subscription / Renew", no "Download my data", no "Notification preferences", no "Connected services", no "Billing history", no "Receipts".</li>
+  <li><strong>The premium expiry date is shown as <code>toLocaleDateString()</code></strong> with no countdown ("48 days left") &mdash; users have to do mental arithmetic.</li>
+  <li><strong>"Payment required" appears as the eyebrow when premium is inactive,</strong> but with no CTA to <em>do</em> the payment. The user has to remember they need to navigate to /payment manually.</li>
+  <li><strong>The storage quota figure (52428800 bytes = 50 MB) is hard-coded</strong> in <code>useAuthStore</code> defaults. Users hitting the cap have no upgrade path.</li>
+  <li><strong>No Sign-out button on this page.</strong> Sign-out lives only in the sidebar account card. Users intuitively look for it on the Account page.</li>
+</ul>
+
+<!-- ---------------- 5.9 Loading & error ---------------- -->
+<h3>5.9 Loading &amp; error states (cross-cutting)</h3>
+
+<h4>Loading state (the best part of the app)</h4>
+<p>Both Analysis and Builder share a near-identical <code>LoadingQuotes</code> component &mdash; a 2.5rem spinning gear (CSS <code>@keyframes spin</code>) plus a cycling array of motivational quotes that swap every 3 seconds. The 10 quotes are warm, varied, and on-brand. This is the only piece of UI in the app that has a personality.</p>
+
+<div class="callout-good">
+  Don&rsquo;t change this. It&rsquo;s the strongest piece of UX in the product. Consider extracting <code>LoadingQuotes</code> into <code>src/components/</code> so it&rsquo;s reusable, and using it on slow operations elsewhere too (file upload, PDF export).
+</div>
+
+<h4>Error states</h4>
+<ul>
+  <li><strong>Three places use <code>window.alert()</code></strong>: <code>FilesPage.jsx:112</code>, <code>AnalysisPage.jsx:592</code>, <code>BuilderPage.jsx:199</code>. Native browser modals are jarring and break the app&rsquo;s visual language.</li>
+  <li><strong>Other places use inline <code>&lt;p className="error-text"&gt;</code></strong> &mdash; orange-pink text under the form. Better, but easy to miss.</li>
+  <li><strong>No toast/notification system.</strong> A single shared toast container (e.g., react-hot-toast or sonner) would unify these patterns for ~30 lines of code.</li>
+  <li><strong>Error normalisation is good.</strong> <code>getReadableError</code> in LoginPage and <code>normalizeErrorDetail</code> in api/client.js handle FastAPI&rsquo;s 422 array shape correctly. This logic should be lifted to a shared util.</li>
+  <li><strong>No empty-error-fallback for the API request.</strong> If the backend returns 500 with an HTML error page, the JSON parse fails silently and the user sees "Request failed."</li>
+</ul>
+
+<!-- ---------------- 5.10 Discovery (NEW) ---------------- -->
+<h3>5.10 Discovery <span style="background:#dcfce7;color:#166534;padding:2px 10px;border-radius:999px;font-size:9pt;font-weight:700;letter-spacing:0.04em;margin-left:6px">NEW &middot; May 2026</span></h3>
+
+<p class="meta" style="margin-top:0">
+  Sources: <code>anchorcv-frontend/src/pages/DiscoveryPage.jsx</code>, <code>anchorcv-backend/app/routers/discovery.py</code>, <code>anchorcv-frontend/src/store/useCvWorkspaceStore.js</code> (discovery&hellip; fields).
+</p>
+
+<p>
+The Discovery feature is a free-text "what are you looking for?" entry point that turns into a personalised career landscape via GPT-4o-mini. It was added to solve the onboarding gap flagged in section 4 of this audit: a brand-new paying user now lands on Discovery instead of the bare dashboard, with a sample landscape pre-populated, so the first-time experience has something to react to instead of four identical menu cards.
+</p>
+
+<h4>Mockup</h4>
+<div class="mock-frame">
+<svg viewBox="0 0 980 720" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-width:980px">
+  <defs>
+    <linearGradient id="discBtn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+  </defs>
+  <rect width="980" height="720" fill="#08111f"/>
+  <rect x="0" y="0" width="280" height="720" fill="rgba(4,9,17,0.75)"/>
+  <text x="32" y="46" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">&#x2693; ANCHORCV</text>
+  <text x="40" y="186" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Dashboard</text>
+  <rect x="20" y="200" width="240" height="40" rx="14" fill="rgba(99,102,241,0.16)" stroke="rgba(129,140,248,0.36)"/>
+  <text x="40" y="224" font-family="Segoe UI" font-size="13" fill="#f5f7fb">Discover</text>
+  <text x="40" y="262" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Analysis</text>
+  <text x="40" y="296" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Builder</text>
+  <text x="40" y="330" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Files</text>
+  <text x="40" y="364" font-family="Segoe UI" font-size="13" fill="#9eb0cf">Account</text>
+
+  <!-- hero -->
+  <rect x="310" y="30" width="640" height="240" rx="24" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="58" font-family="Segoe UI" font-size="11" letter-spacing="2" fill="#c7d2fe">DISCOVER</text>
+  <text x="332" y="90" font-family="Georgia" font-size="22" fill="#f5f7fb">What are you looking for?</text>
+  <text x="332" y="114" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Describe your background, interests, and goals. We&rsquo;ll map out the opportunities and the path to each.</text>
+  <!-- input + explore -->
+  <rect x="332" y="132" width="450" height="42" rx="14" fill="rgba(8,17,31,0.8)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="346" y="158" font-family="Segoe UI" font-size="12" fill="#64748b">e.g., Electrical engineering, power systems, PhD in Germany</text>
+  <rect x="794" y="132" width="120" height="42" rx="999" fill="url(#discBtn)"/>
+  <text x="854" y="160" font-family="Segoe UI" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">Explore</text>
+  <!-- resume widget -->
+  <rect x="332" y="186" width="582" height="58" rx="14" fill="rgba(8,17,31,0.55)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="346" y="208" font-family="Segoe UI" font-size="12" font-weight="700" fill="#f5f7fb">Upload your CV (optional)</text>
+  <text x="346" y="226" font-family="Segoe UI" font-size="10" fill="#9eb0cf">We&rsquo;ll match opportunities to your actual experience. Stays private to this session.</text>
+  <rect x="820" y="200" width="80" height="30" rx="999" fill="rgba(255,255,255,0.06)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="860" y="220" font-family="Segoe UI" font-size="11" fill="#f5f7fb" text-anchor="middle">Upload CV</text>
+
+  <!-- sample banner -->
+  <rect x="310" y="290" width="640" height="60" rx="18" fill="rgba(99,102,241,0.10)" stroke="rgba(99,102,241,0.45)"/>
+  <text x="332" y="316" font-family="Segoe UI" font-size="13" font-weight="700" fill="#c7d2fe">This is a sample landscape.</text>
+  <text x="332" y="334" font-family="Segoe UI" font-size="11" fill="#9eb0cf">Type your own background, interests or target programmes above and click Explore to see your personalised version.</text>
+
+  <!-- summary -->
+  <rect x="310" y="370" width="640" height="80" rx="18" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="332" y="396" font-family="Segoe UI" font-size="12" fill="#f5f7fb">Computer Science is one of the strongest fields in Europe right now, with</text>
+  <text x="332" y="414" font-family="Segoe UI" font-size="12" fill="#f5f7fb">multiple fully-funded routes. DAAD and Erasmus Mundus are the two best-known</text>
+  <text x="332" y="432" font-family="Segoe UI" font-size="12" fill="#f5f7fb">starting points; both have programmes that cover tuition and a stipend.</text>
+
+  <!-- Close matches header -->
+  <text x="310" y="478" font-family="Georgia" font-size="14" font-weight="700" fill="#f5f7fb">Close matches</text>
+  <!-- 4 cards in 2x2 grid -->
+  <rect x="310" y="494" width="310" height="100" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="328" y="518" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">AI &amp; Machine Learning</text>
+  <rect x="528" y="504" width="80" height="20" rx="999" fill="rgba(34,197,94,0.15)"/>
+  <text x="568" y="518" font-family="Segoe UI" font-size="9" fill="#bbf7d0" text-anchor="middle">Growing</text>
+  <text x="328" y="540" font-family="Segoe UI" font-size="10" fill="#9eb0cf">Strongest hiring market across Europe.</text>
+  <text x="328" y="562" font-family="Segoe UI" font-size="10" fill="#f5f7fb"><tspan font-weight="700">Distance:</tspan> close</text>
+  <rect x="328" y="572" width="80" height="16" rx="999" fill="rgba(99,102,241,0.16)"/>
+  <text x="368" y="584" font-family="Segoe UI" font-size="9" fill="#c7d2fe" text-anchor="middle">Germany</text>
+
+  <rect x="640" y="494" width="310" height="100" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="658" y="518" font-family="Segoe UI" font-size="13" font-weight="700" fill="#f5f7fb">Cybersecurity</text>
+  <rect x="858" y="504" width="80" height="20" rx="999" fill="rgba(34,197,94,0.15)"/>
+  <text x="898" y="518" font-family="Segoe UI" font-size="9" fill="#bbf7d0" text-anchor="middle">Growing</text>
+  <text x="658" y="540" font-family="Segoe UI" font-size="10" fill="#9eb0cf">EU institutions are hiring heavily.</text>
+  <text x="658" y="562" font-family="Segoe UI" font-size="10" fill="#f5f7fb"><tspan font-weight="700">Distance:</tspan> 4-8 weeks</text>
+
+  <!-- Known program example -->
+  <text x="310" y="630" font-family="Georgia" font-size="14" font-weight="700" fill="#f5f7fb">Known programs</text>
+  <rect x="310" y="646" width="310" height="62" rx="18" fill="rgba(8,17,31,0.6)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="328" y="668" font-family="Segoe UI" font-size="12" font-weight="700" fill="#f5f7fb">DAAD Scholarship for International</text>
+  <text x="328" y="684" font-family="Segoe UI" font-size="10" fill="#9eb0cf">DAAD, Germany &mdash; Masters</text>
+  <rect x="500" y="666" width="100" height="28" rx="999" fill="url(#discBtn)"/>
+  <text x="550" y="685" font-family="Segoe UI" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Analyse my CV</text>
+
+  <!-- Search tags strip -->
+  <rect x="640" y="646" width="310" height="62" rx="18" fill="rgba(10,18,35,0.86)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="658" y="668" font-family="Segoe UI" font-size="12" font-weight="700" fill="#f5f7fb">Search tags</text>
+  <rect x="658" y="678" width="80" height="20" rx="999" fill="rgba(99,102,241,0.10)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="698" y="692" font-family="Segoe UI" font-size="9" fill="#f5f7fb" text-anchor="middle">DAAD CS 2026</text>
+  <rect x="746" y="678" width="100" height="20" rx="999" fill="rgba(99,102,241,0.10)" stroke="rgba(141,170,219,0.18)"/>
+  <text x="796" y="692" font-family="Segoe UI" font-size="9" fill="#f5f7fb" text-anchor="middle">Erasmus Mundus CS</text>
+</svg>
+<div class="mock-caption">Discovery page (mocked). Sidebar has new "Discover" item, hero panel with input + Explore button + optional CV upload widget, sample-mode banner for first-time users, then summary, close matches, known programs (with "Analyse my CV" hand-off button), and a search-tags strip.</div>
+</div>
+
+<h4>What it does (user-visible)</h4>
+<ul>
+  <li><strong>Free-text input.</strong> User types something like "electrical engineering, power systems, PhD in Germany" or picks one of four example queries shown as chips below the input.</li>
+  <li><strong>Optional CV upload.</strong> A small "Upload your CV (optional)" panel directly under the input. PDFs, DOCX, and TXT are accepted. The text is parsed server-side, kept in the browser session only (not saved to Files), and used as additional context for the GPT prompt so the landscape personalises to the user&rsquo;s actual experience.</li>
+  <li><strong>Result is a structured landscape, not a free-text answer.</strong> Five blocks rendered as cards: a 3-4 sentence summary, 4-6 "Close matches" subfields with a Growing/Stable badge and "distance" estimate, 2-3 "Nearby" adjacent fields that require some upskilling, 1-3 "Known programs" pulled from a strict allowlist (DAAD, Commonwealth, Chevening, Fulbright, Erasmus Mundus, Marie Sk&#322;odowska-Curie, EPSRC, NSERC, JSPS, KAUST, Aga Khan Foundation, OFID), and 10-15 search tags as clickable Google query chips.</li>
+  <li><strong>Hand-off into Analysis.</strong> Each "Known programs" card has an "Analyse my CV" button that pre-fills the program metadata into the Analysis page&rsquo;s requirement textarea and navigates the user there. This is the only existing route from Discovery into the rest of the app.</li>
+  <li><strong>Sample landscape for first-time users.</strong> Users whose <code>onboarded_at</code> is null see a hardcoded "Computer Science Master&rsquo;s in Europe" landscape on first visit, with a purple banner reading "This is a sample landscape." All buttons in the sample (Analyse my CV, search tags, copy all) are disabled. The sample disappears the moment the user clicks Explore for real.</li>
+  <li><strong>Persistent generation across navigation.</strong> Discovery state lives in the Zustand workspace store, not in local component state, so a user who clicks "Explore" then immediately navigates to Analysis sees the result waiting for them when they return to /discover. The OpenAI fetch keeps running in the background.</li>
+  <li><strong>Regenerate button.</strong> Below the summary, bypasses the cache for the same query.</li>
+  <li><strong>Cache "Loaded from cache" indicator</strong> shown when the response came back instantly from SQLite.</li>
+</ul>
+
+<h4>What it does (technical)</h4>
+<table>
+  <tr><th>Layer</th><th>Implementation</th></tr>
+  <tr><td>Backend route</td><td><code>POST /api/discover/landscape</code> (Pydantic body), <code>POST /api/discover/extract-resume</code> (multipart upload), <code>GET /api/discover</code> not exposed</td></tr>
+  <tr><td>Auth</td><td><code>Depends(get_current_user)</code> &mdash; both endpoints reject anonymous calls with 401.</td></tr>
+  <tr><td>Rate limit</td><td>20 calls/day for free users, 500/day for premium. Counter stored in SQLite (<code>discovery_cache.db</code> &rarr; <code>daily_calls</code> table).</td></tr>
+  <tr><td>Caching</td><td>SQLite (<code>landscape_cache</code> table) keyed on hash of (lowercased query + first 1k chars of resume text). 24-hour TTL. Same query without resume and same query with resume yield different cache entries.</td></tr>
+  <tr><td>Allowlist enforcement</td><td>Hard-coded list of 12 programmes injected into the system prompt. Model is explicitly instructed not to invent programme names. If nothing matches, <code>known_opportunities</code> is returned empty and search_tags carry the gap.</td></tr>
+  <tr><td>Validation</td><td>Nested Pydantic models (<code>Subfield</code>, <code>AdjacentField</code>, <code>KnownOpportunity</code>, <code>LandscapeResponse</code>) validate the GPT JSON shape before responding. Invalid shapes return 502 instead of leaking malformed JSON to the client.</td></tr>
+  <tr><td>Model + cost</td><td>gpt-4o-mini at temperature 0.7, response_format json_object, max_tokens 2000. ~$0.0012 per call. Resume context capped at 2000 chars in the prompt to control cost.</td></tr>
+  <tr><td>Frontend route</td><td><code>/discover</code>, mounted inside the protected <code>Layout</code> group in <code>App.jsx</code>. Sidebar nav item added in <code>Layout.jsx</code> (second after Dashboard).</td></tr>
+  <tr><td>Onboarding routing</td><td><code>ProtectedRoute</code> redirects users with <code>onboarded_at = null</code> from <code>/</code> to <code>/discover</code>. The redirect fires only from the bare dashboard so the user can navigate freely once on Discovery.</td></tr>
+  <tr><td>Analysis hand-off</td><td>After a successful first run on the Analysis page, a fire-and-forget call to <code>POST /api/auth/me/onboard</code> sets <code>onboarded_at = now()</code> in <code>anchor_users</code>, ending the sample-mode period.</td></tr>
+  <tr><td>Database migration</td><td>New column <code>anchor_users.onboarded_at TIMESTAMPTZ</code> (nullable). Applied 5 May 2026.</td></tr>
+</table>
+
+<h4>What works</h4>
+<ul>
+  <li><strong>The allowlist is the strongest decision.</strong> The original proposal allowed the model to invent programme names; tightening to a 12-item allowlist removed the single biggest reputational risk. The trade-off &mdash; missing some real-but-niche programmes &mdash; is acceptable for v1.</li>
+  <li><strong>Format reuses the existing visual language</strong> (panel cards, eyebrows, primary-button gradient, two-up grid). Discovery doesn&rsquo;t feel like a foreign component grafted on, unlike the teal Chrome-extension card called out in section 5.4.</li>
+  <li><strong>The "distance_from_user" field</strong> ("close", "4-8 weeks", "3-6 months", "career shift") is unusually honest framing for an AI tool &mdash; it tells the user how far they are from a field rather than just listing options uncritically. Pairs with the "Credibility Guardian" personas already used in the analysis prompts.</li>
+  <li><strong>Sample mode</strong> solves the empty-state problem flagged for the Files, Analysis result, and Builder preview panels in section 6.5. A first-time user has something concrete to react to.</li>
+  <li><strong>Persistent state via Zustand</strong> matches the pattern already used for Analysis and Builder &mdash; one consistent way to handle long-running results.</li>
+  <li><strong>Search tags as a fallback</strong> is honest about the LLM&rsquo;s limits: when the model can&rsquo;t name a specific programme, it gives the user the queries to find live calls themselves.</li>
+</ul>
+
+<h4>What doesn&rsquo;t (yet)</h4>
+<ul>
+  <li><strong>No quota counter visible to the user.</strong> A free user can hit the 20-call cap silently and only learn about it from a 429 response. A small "X of 20 today" chip somewhere on the page would set expectations.</li>
+  <li><strong>Resume widget UI is plain.</strong> No progress bar during upload, no preview of which sections of the CV were actually used, no way to choose a previously-uploaded resume from Files. Day-1 acceptable but a clear v2 improvement.</li>
+  <li><strong>Sample-mode banner is the only visual cue;</strong> the cards and search tags are dimmed and disabled but visually still look "real." A more deliberate "demo" treatment (watermark, dotted border, "Example" badge per card) would prevent confusion.</li>
+  <li><strong>No analytics on what people search for.</strong> Queries are hashed and logged to the SQLite <code>query_log</code> table but there&rsquo;s no UI to view them. This is the highest-value data the app could collect &mdash; tells you exactly which integrations to build next.</li>
+  <li><strong>Single-server cache.</strong> SQLite cache is fine for the current single-host deployment; if this scales horizontally, each box gets its own cache and quota counter, effectively doubling a user&rsquo;s daily limit. Migrate to Redis when you do.</li>
+  <li><strong>No "Suggest a programme" path.</strong> If a user knows of a real programme not in the allowlist (e.g., specific national funding bodies), there&rsquo;s no way to surface it. A simple form that creates a moderation entry would grow the list safely.</li>
+  <li><strong>Sample landscape is hardcoded for "Computer Science Master&rsquo;s in Europe."</strong> Engineering students, medical students, social scientists all see the same sample. A field-aware sample (rotated based on user&rsquo;s registered country/interest, or selected from 4-5 hand-curated samples) would feel more personal.</li>
+  <li><strong>No content moderation.</strong> A user could type any query (including off-topic or adversarial ones) and the model will respond. Not a live problem at current volume; budget a moderation pass before public launch.</li>
+  <li><strong>Loading state is just the button text changing.</strong> No skeleton cards, no progress indicator while the OpenAI call is in flight. The "Loading quotes" component used on Analysis and Builder would fit nicely here.</li>
+</ul>
+
+<h4>How it changes the IA</h4>
+<p>
+The sidebar now has six items (Dashboard, Discover, Analysis, Builder, Files, Account). The intended hierarchy is <strong>Discover &rarr; Analysis &rarr; Builder</strong>: Discover surfaces an opportunity, Analysis evaluates fit against the candidate&rsquo;s CV, Builder produces the deliverable. The "Analyse my CV" button on Known Programs cards explicitly bridges Discover to Analysis. The Builder is not yet wired into this flow &mdash; a v2 enhancement could let an Analysis result feed directly into a Builder pre-fill so the full path is one click each.
+</p>
+
+<p>
+The Dashboard&rsquo;s four-card grid (flagged as visually identical and unhelpful in section 5.4) is now mostly bypassed by first-time users. A returning user without active context still lands on it, which is still a problem; section 5.4&rsquo;s recommendations stand.
+</p>
+
+<!-- =================================================================== -->
+<h2>6. Cross-cutting issues</h2>
+
+<h3>6.1 Information architecture &amp; navigation</h3>
+<ul>
+  <li>5 nav items, no grouping, no labels. Fine for the current footprint, but no headroom for adding features (Cover Letters? Email Templates? Saved Job Boards?) without it becoming cluttered.</li>
+  <li><strong>Naming inconsistency:</strong> sidebar says "Analysis", dashboard card says "Resume Intelligence". Pick one.</li>
+  <li><strong>No breadcrumbs.</strong> Not critical at current depth, but a "you are here" indicator would help once paths get longer than one level.</li>
+  <li><strong>No global search.</strong> Once a user has many files and analyses, they&rsquo;ll need it.</li>
+</ul>
+
+<h3>6.2 Mobile &amp; responsive</h3>
+<ul>
+  <li>One media query at <code>max-width: 960px</code> collapses the sidebar to a top stripe and turns 2- and 3-column grids into a single column.</li>
+  <li><strong>The sidebar still renders all five nav items, the brand block, and the account card above the page content on mobile.</strong> A first-time user has to scroll past ~600px of chrome to see what they came for.</li>
+  <li><strong>No mobile nav pattern</strong> &mdash; no hamburger, no bottom tab bar, no collapse.</li>
+  <li><strong>No tap-friendly sizing.</strong> The <code>.nav-link</code> has <code>0.8rem 1rem</code> padding, which is roughly 38px tall &mdash; under Apple&rsquo;s 44px and Google&rsquo;s 48px touch-target recommendations.</li>
+  <li><strong>The 2-column form/result layouts on Analysis and Builder become two stacked very-tall blocks on mobile.</strong> The result panel can be 70vh tall and the user has to scroll past it to get back to the form.</li>
+  <li><strong>Native file inputs render as tiny clipped buttons</strong> on mobile, especially on iOS Safari.</li>
+  <li><strong>The Files list rows wrap awkwardly</strong> &mdash; three buttons + filename + size become four lines of unaligned text.</li>
+</ul>
+
+<h3>6.3 Accessibility</h3>
+<table>
+  <tr><th>Area</th><th>Current state</th></tr>
+  <tr><td>Skip link</td><td>None.</td></tr>
+  <tr><td>Page <code>&lt;title&gt;</code> updates</td><td>Static "AnchorCV" only; never changes per route.</td></tr>
+  <tr><td>Focus styles</td><td>Browser default only; no <code>:focus-visible</code> styling. On dark backgrounds the default focus ring is often invisible.</td></tr>
+  <tr><td>Form labels</td><td>Most inputs use placeholders only, no <code>&lt;label&gt;</code> association. Screen readers announce nothing.</td></tr>
+  <tr><td>Live regions</td><td>None. When an analysis finishes, no <code>aria-live</code> announcement.</td></tr>
+  <tr><td>Color contrast</td><td>Muted-copy <code>#9eb0cf</code> on <code>#08111f</code> is roughly 6.7:1 &mdash; passes AA. But the inline-styled <code>#64748b</code> on dark panels is closer to 3.7:1 &mdash; fails AA for normal text. Several inline <code>color: "#94a3b8"</code> usages are similarly borderline.</td></tr>
+  <tr><td>Keyboard navigation</td><td>Works for inputs and <code>&lt;Link&gt;</code>s. The "interactive panels" on the dashboard are <code>&lt;Link&gt;</code> &mdash; good.</td></tr>
+  <tr><td>Image alt text</td><td>Only one SVG (sidebar anchor) and it has <code>aria-hidden="true"</code> &mdash; appropriate.</td></tr>
+  <tr><td>Semantic HTML</td><td>Mostly OK. <code>&lt;main&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;nav&gt;</code> are used. <code>&lt;section&gt;</code> wraps page content. Could add <code>&lt;h1&gt;</code> per route (currently the sidebar h1 is the only one).</td></tr>
+</table>
+
+<h3>6.4 Brand identity</h3>
+<ul>
+  <li>The brand mark is a generic anchor SVG and the word "AnchorCV" in Georgia. There&rsquo;s no logo, no wordmark treatment, no monogram.</li>
+  <li>The product name "AnchorCV" is shown twice in the sidebar (eyebrow + h1) and once in the page title. It&rsquo;s also used as the brand mark in the auth eyebrow as a single anchor emoji. There&rsquo;s no consistency.</li>
+  <li>The marketing tagline ("AI-powered CV builder for international students") repeats verbatim in the auth panel and the sidebar &mdash; missed opportunity to introduce the product more compellingly the first time vs. as ambient context the second.</li>
+  <li>No imagery. No photos of students, no illustration of the workflow, no flowchart, nothing visual that says "this is for me".</li>
+  <li>No social proof anywhere. No "trusted by 1,000 students", no logos of partner universities, no testimonials.</li>
+</ul>
+
+<h3>6.5 Empty states</h3>
+<table>
+  <tr><th>Where</th><th>Current empty state</th></tr>
+  <tr><td>Files list</td><td>"No files are stored yet."</td></tr>
+  <tr><td>Analysis result panel</td><td>"Your formatted result will render here."</td></tr>
+  <tr><td>Builder preview panel</td><td>"Generated HTML preview will appear here after build."</td></tr>
+  <tr><td>Analysis &mdash; no missing keywords</td><td>"No missing keywords returned."</td></tr>
+  <tr><td>Analysis &mdash; no improvements</td><td>"No improvements returned."</td></tr>
+</table>
+
+<p>All of these are passive sentences. None contain a CTA, an example, an illustration, or a "do this next" prompt. This is the single most actionable cross-cutting fix in the audit.</p>
+
+<h3>6.6 Forms &amp; inputs</h3>
+<ul>
+  <li>No inline validation. Errors only appear on submit.</li>
+  <li>No password strength meter, no show/hide toggle, no minimum length hint.</li>
+  <li>Country is free text on registration.</li>
+  <li>Native browser color picker on the Builder page.</li>
+  <li>Native file input on the Files page (the FileDropzone component is at least styled, but only the two on Analysis/Builder use it).</li>
+  <li>Selects use system styling &mdash; the dropdown chevron, scrollbar, and option styling differ on every OS.</li>
+  <li>No autocomplete attributes on the auth inputs (<code>autocomplete="email"</code>, <code>autocomplete="current-password"</code>) &mdash; password managers behave worse than they should.</li>
+  <li>Textareas are fixed-rows and don&rsquo;t auto-grow.</li>
+</ul>
+
+<h3>6.7 Error handling</h3>
+<p>Covered in 5.9 above. Summary: three <code>alert()</code>s, several inline error texts, no toast system, no global error boundary.</p>
+
+<h3>6.8 Animation &amp; motion</h3>
+<ul>
+  <li>One CSS animation in the entire app: <code>@keyframes spin</code> for the loading gear.</li>
+  <li>No page transitions, no card hover lifts, no entry animations on result panels, no progress animations on the storage meter, no fade-in on the spinner&rsquo;s rotating quotes.</li>
+  <li>Hover states are static (background color change only). No transform, no scale, no shadow shift.</li>
+  <li>This is a major contributor to the "boring" feedback &mdash; the app feels static.</li>
+</ul>
+
+<h3>6.9 Tailwind dead weight</h3>
+<ul>
+  <li><code>tailwind.config.js</code> is present but the <code>theme.extend</code> is empty.</li>
+  <li><code>postcss.config.js</code> exists.</li>
+  <li>No JSX file uses any Tailwind utility class. Every styled element is either a globals.css class or an inline <code>style</code> object.</li>
+  <li>This means: ~10MB of Tailwind preflight + utilities is being scanned and possibly emitted, with no benefit; new contributors will be misled into thinking Tailwind is the styling system; the project ships extra build dependencies (<code>autoprefixer</code>, <code>postcss</code>, <code>tailwindcss</code>) for no reason.</li>
+  <li>Decision needed: <strong>actually use Tailwind</strong> (rip out globals.css, convert components) or <strong>remove Tailwind</strong> (delete the configs and the three deps).</li>
+</ul>
+
+<h3>6.10 Copy &amp; tone</h3>
+<ul>
+  <li>The brand voice is split. Loading quotes are warm and student-friendly ("&#x2728; Your next opportunity is one good analysis away&hellip;"). Page titles are formal and serif ("Resume Intelligence", "Profile and quota"). Error messages are technical ("Request failed.", "Invalid webhook payload.").</li>
+  <li>"Welcome back" hard-coded greeting (already covered).</li>
+  <li>"Premium" is the most overused term &mdash; it appears 11 times across the JSX. It never gets defined; it just <em>is</em>.</li>
+  <li>British vs American English: "optimised" (Builder loading quote), "Optimization" (output type label), "ATS-Optimized CV" (format label). Pick one.</li>
+  <li>"AI-powered CV builder for international students" is the tagline in two places. It&rsquo;s descriptive but not memorable.</li>
+</ul>
+
+<!-- =================================================================== -->
+<h2>7. Prioritized findings table</h2>
+
+<table>
+  <tr>
+    <th style="width:9%">Severity</th>
+    <th style="width:18%">Area</th>
+    <th>Finding</th>
+    <th style="width:22%">Where to fix</th>
+  </tr>
+  <tr class="sev-high">
+    <td><span class="pill pill-h">HIGH</span></td>
+    <td>Onboarding</td>
+    <td>No first-run experience. New paying users land on a generic dashboard with no "do this first" guidance and no sample data.</td>
+    <td>New <code>OnboardingFlow</code> component triggered on first dashboard visit; <code>onboarded_at</code> column on <code>anchor_users</code></td>
+  </tr>
+  <tr class="sev-high">
+    <td><span class="pill pill-h">HIGH</span></td>
+    <td>Files page</td>
+    <td>Replacement-character bug renders &#xFFFD; as the size/date separator on every file row.</td>
+    <td><code>FilesPage.jsx:105</code> &mdash; replace with <code>&amp;middot;</code></td>
+  </tr>
+  <tr class="sev-high">
+    <td><span class="pill pill-h">HIGH</span></td>
+    <td>Pricing</td>
+    <td>Price is invisible everywhere &mdash; users go to checkout without knowing the cost.</td>
+    <td>Payment page; new pricing block on Login page; Account page upgrade card</td>
+  </tr>
+  <tr class="sev-high">
+    <td><span class="pill pill-h">HIGH</span></td>
+    <td>Analysis page</td>
+    <td>Both file dropzones display the bold text "Choose a resume file" &mdash; resume vs JD distinction is invisible.</td>
+    <td><code>FileDropzone.jsx:14</code> &mdash; parameterise the strong text</td>
+  </tr>
+  <tr class="sev-high">
+    <td><span class="pill pill-h">HIGH</span></td>
+    <td>Visual consistency</td>
+    <td>Three button systems coexist (indigo gradient pill, teal rectangle, gray pill). Six border-radius scales. Eight font sizes. Inline styles override CSS.</td>
+    <td>Establish a design tokens file; convert inline styles to CSS classes; pick one button system</td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Auth</td>
+    <td>No "Forgot password" flow exists. Users will lock themselves out.</td>
+    <td>New <code>/auth/forgot-password</code> backend route; new <code>ResetPasswordPage</code></td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Errors</td>
+    <td>Three places use <code>window.alert()</code>; inline error text easy to miss.</td>
+    <td>Adopt a toast library (sonner is ~3KB); replace alerts</td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Mobile</td>
+    <td>Sidebar dumps ~600px of chrome above content on mobile. No mobile nav pattern.</td>
+    <td>Layout component &mdash; collapse to hamburger or bottom-tab on <code>max-width:768px</code></td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Account page</td>
+    <td>Page is dramatically underbuilt &mdash; no password change, no cancel, no receipts, no expiry countdown, no sign-out.</td>
+    <td>AccountPage rewrite; new auth routes for password change &amp; account deletion</td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Dashboard</td>
+    <td>Four feature cards are visually identical and offer no order, no icons, no recent-activity context.</td>
+    <td>DashboardPage redesign; per-card icon; "continue where you left off" widget</td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Files page</td>
+    <td>Delete is destructive without confirmation; no search/filter/sort; no file-type icons.</td>
+    <td>Add confirm dialog; sort dropdown; PDF/DOCX/TXT badges</td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Builder</td>
+    <td>Form has 12 fields visible at once with no progressive disclosure. Native color picker is ugly.</td>
+    <td>Group fields under collapsible sections; replace native color picker with 6-swatch palette</td>
+  </tr>
+  <tr class="sev-med">
+    <td><span class="pill pill-m">MED</span></td>
+    <td>Analysis</td>
+    <td>6 output types in one select with no descriptions; users can&rsquo;t tell which to pick.</td>
+    <td>Replace select with 6 picker cards (similar to <code>FormatCard</code>) with one-line descriptions</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>Brand</td>
+    <td>Sidebar shows "AnchorCV" twice; eyebrow uses bare anchor emoji; tagline repeats.</td>
+    <td>Layout sidebar &mdash; pick one brand block</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>HTML head</td>
+    <td>No favicon, no meta description, no OG tags, no theme-color.</td>
+    <td><code>index.html</code> + new favicon set</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>Tooling</td>
+    <td>Tailwind is configured but unused.</td>
+    <td>Either adopt Tailwind throughout or remove the three dev dependencies and configs</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>Accessibility</td>
+    <td>No skip link, no focus-visible styles, no per-route page titles, placeholder-only labels.</td>
+    <td>Add useEffect to update document.title per page; <code>:focus-visible</code> styles in globals.css; label/aria-label on inputs</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>Encoding</td>
+    <td>Mojibake patch in <code>AnalysisPage.jsx</code> indicates upstream encoding bug.</td>
+    <td>Investigate <code>anchor_core.format_ai_response</code> output encoding; remove the client-side patch</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>Loading</td>
+    <td>Only one animation in the app. Static hover states. No transitions.</td>
+    <td>Add CSS transitions to button hover, card hover, and panel entry</td>
+  </tr>
+  <tr class="sev-low">
+    <td><span class="pill pill-l">LOW</span></td>
+    <td>Copy</td>
+    <td>"Welcome back" greets first-time users; British/American English mixed; "Premium" undefined.</td>
+    <td>Copy pass; conditional greeting based on visit count</td>
+  </tr>
+</table>
+
+<!-- =================================================================== -->
+<h2>8. Quick wins (1 week of work)</h2>
+
+<p>If you do nothing else from this audit, do these:</p>
+<ol>
+  <li><strong>Fix the &#xFFFD; bug in FilesPage.jsx line 105.</strong> 2-character change. Visible to every paying user.</li>
+  <li><strong>Show the price on the Payment page</strong> with a small feature list (3 bullets) and a "what you get" line.</li>
+  <li><strong>Differentiate the two FileDropzone labels</strong> by parameterising the strong text in <code>FileDropzone.jsx</code>.</li>
+  <li><strong>Add a "Forgot password?" link to login</strong> &mdash; even if the backend route is "email <code>support@&hellip;</code>", the absence is a bigger problem than the inelegant fallback.</li>
+  <li><strong>Replace the three <code>alert()</code> calls with inline error text</strong> (or a toast library).</li>
+  <li><strong>Replace the native color picker on Builder</strong> with 6 preset swatches.</li>
+  <li><strong>Confirmation dialog before file delete.</strong></li>
+  <li><strong>Conditional greeting on Dashboard:</strong> "Welcome to AnchorCV, {first_name}" first time, "Welcome back" after.</li>
+  <li><strong>Update <code>document.title</code> per route</strong> &mdash; "Analysis &middot; AnchorCV", "Builder &middot; AnchorCV", etc. Browser tab titles matter.</li>
+  <li><strong>Add a favicon.</strong></li>
+  <li><strong>Decide on Tailwind.</strong> Either commit to it or remove it.</li>
+</ol>
+
+<p>None of these need a design system overhaul. They&rsquo;re all 1&ndash;30 line changes.</p>
+
+<!-- =================================================================== -->
+<h2>9. Bigger questions to answer before any redesign</h2>
+
+<p>If you do go further than the quick wins, decide these <em>before</em> drawing any new screens, because every visual decision flows from them:</p>
+
+<ol>
+  <li><strong>Is AnchorCV a one-time tool or a workspace?</strong>
+    Right now it&rsquo;s both: students arrive to do a single CV, but Files + Account suggest you want them back. The whole IA depends on which you&rsquo;re optimising for.
+  </li>
+  <li><strong>Free tier or paid-only?</strong>
+    Currently paid-only with no preview. Adding a "preview without paying" path would dramatically improve activation but costs you margin.
+  </li>
+  <li><strong>What&rsquo;s the primary persona?</strong>
+    "International students" is a 100M-person market with very different needs (undergrad applying to Master&rsquo;s, working professional switching countries, scholar applying for funding). The product currently tries to serve all three with one UI.
+  </li>
+  <li><strong>Should Analysis and Builder be one feature?</strong>
+    Both upload a CV. Both produce something. A unified flow ("upload &rarr; choose what to do &rarr; result") would simplify the IA and reduce duplicated form logic.
+  </li>
+  <li><strong>Light mode?</strong>
+    Dark mode looks "techy" but documents (CVs) are inherently white. Many users will prefer light mode, especially in academic contexts.
+  </li>
+  <li><strong>Mobile-first or desktop-first?</strong>
+    The product is desktop-first today. International students apply from phones. This drives the entire layout decision.
+  </li>
+  <li><strong>What does the brand actually feel like?</strong>
+    Anchor (steady, dependable, nautical), AI-powered (futuristic), international students (warm, hopeful, ambitious), CV builder (professional, dry). Pick one. Right now the visuals split the difference and feel none of them.
+  </li>
+</ol>
+
+<p class="small" style="margin-top:36px; padding-top:14px; border-top:1px solid #cbd5e1;">
+  End of audit. This document covers the current setup only. A redesign proposal, a separate audit of the marketing/landing experience (if one exists), and a feasibility brief for the auto-fetch &amp; auto-apply automation idea you mentioned would each be their own document.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AnchorCV — AI Career Intelligence for International Students | CV Analysis, ATS Check & World-Class Templates</title>
+<meta name="description" content="Upload your CV and get evidence-anchored job match scores, ATS checks, tailored cover letters, professor emails, and World Bank, ADB, immigration, legal & executive CV templates. Powered by GPT-4o and Claude. $9 per 3-month season.">
+<meta name="keywords" content="AI CV builder, resume analysis, ATS checker, CV templates, World Bank CV format, ADB consultant CV, immigration CV, cover letter generator, scholarship application, international students, job match score, professor email generator">
+<meta name="author" content="AnchorCV">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://anchorcv.com/">
+<meta name="theme-color" content="#0a0a14">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://anchorcv.com/">
+<meta property="og:site_name" content="AnchorCV">
+<meta property="og:title" content="AnchorCV — The AI That Shows Its Work">
+<meta property="og:description" content="Evidence-anchored CV analysis, ATS checks, and world-class templates (World Bank, ADB, immigration, legal, executive). Choose GPT-4o or Claude. Try it with your resume.">
+<meta property="og:image" content="https://anchorcv.com/og-cover.png">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AnchorCV — The AI That Shows Its Work">
+<meta name="twitter:description" content="Evidence-anchored CV analysis, ATS checks & world-class templates. Powered by GPT-4o and Claude.">
+<meta name="twitter:image" content="https://anchorcv.com/og-cover.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AnchorCV",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "url": "https://anchorcv.com/",
+  "description": "AI career intelligence platform for international students and professionals: evidence-anchored CV analysis, ATS checks, job match scores, cover letters, professor emails, and institutional CV templates (World Bank, ADB, immigration, legal, executive).",
+  "offers": {
+    "@type": "Offer",
+    "price": "9.00",
+    "priceCurrency": "USD",
+    "description": "3-month full access season pass"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "127"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How is AnchorCV different from ChatGPT?",
+      "acceptedAnswer": {"@type": "Answer", "text": "AnchorCV never invents experience. Every rewrite, score, and suggestion is anchored to evidence found in your actual CV, passed through multi-stage quality gates. You also choose the engine: GPT-4o or Claude."}
+    },
+    {
+      "@type": "Question",
+      "name": "What CV templates does AnchorCV support?",
+      "acceptedAnswer": {"@type": "Answer", "text": "World Bank CV, ADB Consultant CV (CMS format), Immigration/Visa CV for points-based applications, Lawyer/Legal CV, and Executive CV. You can convert your CV into any format or score it against the format's standards."}
+    },
+    {
+      "@type": "Question",
+      "name": "How much does AnchorCV cost?",
+      "acceptedAnswer": {"@type": "Answer", "text": "$9 for a full 3-month application season. No subscription traps — renew only when you need it."}
+    },
+    {
+      "@type": "Question",
+      "name": "Will my CV pass ATS screening?",
+      "acceptedAnswer": {"@type": "Answer", "text": "AnchorCV's ATS Shield simulates automated screening, flags formatting and keyword issues, and shows exactly what to fix before you apply."}
+    },
+    {
+      "@type": "Question",
+      "name": "Is my CV data safe?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Your CV is processed securely, used only to generate your results, and never used to train models or shared with third parties."}
+    }
+  ]
+}
+</script>
+
+<style>
+:root{
+  --bg:#0a0a14;--bg2:#0e0e1c;--panel:rgba(255,255,255,.035);--border:rgba(255,255,255,.09);
+  --indigo:#6d5ef7;--indigo-lt:#8b7ff9;--violet:#7c3aed;--amber:#fcd34d;--teal:#2dd4a8;
+  --text:#eef0f6;--muted:#9aa1b5;--t:all .3s cubic-bezier(.22,.9,.35,1);
+  --syne:'Syne',sans-serif;--dm:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--dm);overflow-x:hidden;line-height:1.6}
+::selection{background:var(--indigo);color:#fff}
+
+/* ── Ambient background ─────────────────────────── */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;z-index:0;pointer-events:none;animation:drift 22s ease-in-out infinite alternate}
+.orb-a{width:520px;height:520px;background:radial-gradient(circle,rgba(109,94,247,.32),transparent 65%);top:-140px;left:-120px}
+.orb-b{width:460px;height:460px;background:radial-gradient(circle,rgba(45,212,168,.16),transparent 65%);top:38%;right:-160px;animation-delay:-8s}
+.orb-c{width:400px;height:400px;background:radial-gradient(circle,rgba(252,211,77,.10),transparent 65%);bottom:-120px;left:28%;animation-delay:-15s}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(60px,40px,0) scale(1.12)}}
+
+main,header,footer,section{position:relative;z-index:1}
+.wrap{max-width:1180px;margin:0 auto;padding:0 1.4rem}
+
+/* ── Nav ────────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(16px);background:rgba(10,10,20,.72);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1180px;margin:0 auto;padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{font-family:var(--syne);font-weight:800;font-size:1.25rem;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:.45rem}
+.logo span{color:var(--indigo-lt)}
+.nav-links{display:flex;gap:1.6rem;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:500;transition:var(--t)}
+.nav-links a:hover{color:var(--text)}
+.btn{display:inline-block;text-decoration:none;font-weight:700;border-radius:40px;transition:var(--t);cursor:pointer;border:none;font-family:var(--dm)}
+.btn-primary{background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;padding:.72rem 1.6rem;box-shadow:0 8px 24px rgba(109,94,247,.35)}
+.btn-primary:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 34px rgba(109,94,247,.5)}
+.btn-outline{border:1px solid var(--border);color:var(--text);padding:.7rem 1.5rem;background:rgba(255,255,255,.03)}
+.btn-outline:hover{border-color:var(--indigo-lt);transform:translateY(-2px)}
+.btn-lg{padding:1rem 2.4rem;font-size:1.1rem}
+
+/* ── Hero ───────────────────────────────────────── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:7.5rem 0 4rem;perspective:1200px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:3rem;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo-lt);font-weight:700;border:1px solid rgba(109,94,247,.35);border-radius:40px;padding:.4rem 1rem;background:rgba(109,94,247,.08)}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+h1{font-family:var(--syne);font-size:clamp(2.4rem,5.2vw,4rem);line-height:1.08;font-weight:800;margin:1.2rem 0 1rem}
+h1 .grad{background:linear-gradient(100deg,var(--indigo-lt) 0%,var(--amber) 55%,var(--teal) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{color:var(--muted);font-size:1.15rem;max-width:540px;margin-bottom:2rem}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2.2rem}
+.hero-stats{display:flex;gap:1.6rem;flex-wrap:wrap}
+.stat b{font-family:var(--syne);font-size:1.5rem;color:var(--amber);display:block;line-height:1.1}
+.stat span{font-size:.82rem;color:var(--muted)}
+
+/* 3D CV stack */
+.cv-scene{position:relative;height:480px;transform-style:preserve-3d}
+.cv-stack{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .25s ease-out}
+.cv-card{position:absolute;width:290px;left:50%;top:50%;border-radius:18px;padding:1.4rem;background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid var(--border);backdrop-filter:blur(14px);box-shadow:0 30px 60px rgba(0,0,0,.5);transform-style:preserve-3d}
+.cv-card h4{font-family:var(--syne);font-size:.95rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem}
+.cv-card .bar{height:7px;border-radius:4px;background:rgba(255,255,255,.1);margin:.45rem 0;overflow:hidden}
+.cv-card .bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--teal));animation:fill 2.4s ease forwards;transform-origin:left}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.cv-card .line{height:6px;border-radius:3px;background:rgba(255,255,255,.09);margin:.4rem 0}
+.cv-card .line.short{width:62%}
+.cv-c1{transform:translate(-50%,-50%) translateZ(90px) rotateY(-8deg) rotateX(4deg)}
+.cv-c2{transform:translate(-50%,-50%) translate3d(120px,-105px,10px) rotateY(-14deg) rotateX(6deg);width:230px;opacity:.95}
+.cv-c3{transform:translate(-50%,-50%) translate3d(-140px,120px,-60px) rotateY(10deg);width:220px;opacity:.85}
+.score-ring{width:86px;height:86px;border-radius:50%;background:conic-gradient(var(--teal) 0deg,var(--teal) 306deg,rgba(255,255,255,.1) 306deg);display:grid;place-items:center;margin:0 auto .5rem}
+.score-ring b{width:66px;height:66px;border-radius:50%;background:#12121f;display:grid;place-items:center;font-family:var(--syne);font-size:1.3rem;color:var(--teal)}
+.chip-3d{position:absolute;padding:.5rem .95rem;border-radius:40px;font-size:.78rem;font-weight:700;border:1px solid var(--border);backdrop-filter:blur(10px);white-space:nowrap;animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) translateZ(120px)}50%{transform:translateY(-14px) translateZ(120px)}}
+.chip-ats{top:6%;left:2%;background:rgba(45,212,168,.14);color:var(--teal)}
+.chip-wb{bottom:10%;right:0;background:rgba(252,211,77,.12);color:var(--amber);animation-delay:-2s}
+.chip-ai{top:44%;right:-4%;background:rgba(109,94,247,.16);color:var(--indigo-lt);animation-delay:-3.5s}
+
+/* ── Sections ───────────────────────────────────── */
+section{padding:5.5rem 0}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 3.2rem}
+.sec-head .kicker{color:var(--indigo-lt);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem}
+h2{font-family:var(--syne);font-size:clamp(1.8rem,3.6vw,2.6rem);font-weight:800;margin:.6rem 0 .8rem}
+.sec-head p{color:var(--muted);font-size:1.05rem}
+
+/* Feature tilt cards */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem;perspective:1000px}
+.tilt{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:1.8rem;transition:transform .2s ease-out,border-color .3s,box-shadow .3s;transform-style:preserve-3d;position:relative;overflow:hidden}
+.tilt::before{content:"";position:absolute;inset:0;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(109,94,247,.14),transparent 45%);opacity:0;transition:opacity .3s;pointer-events:none}
+.tilt:hover::before{opacity:1}
+.tilt:hover{border-color:rgba(109,94,247,.45);box-shadow:0 24px 50px rgba(0,0,0,.45)}
+.tilt .ico{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;margin-bottom:1.1rem;background:linear-gradient(150deg,rgba(109,94,247,.25),rgba(124,58,237,.08));border:1px solid rgba(109,94,247,.3);transform:translateZ(30px)}
+.tilt h3{font-family:var(--syne);font-size:1.15rem;margin-bottom:.5rem;transform:translateZ(20px)}
+.tilt p{color:var(--muted);font-size:.94rem;transform:translateZ(12px)}
+.tilt .tag{display:inline-block;margin-top:.9rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);background:rgba(45,212,168,.1);border:1px solid rgba(45,212,168,.25);padding:.25rem .7rem;border-radius:30px}
+
+/* Templates showcase */
+.tpl-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;perspective:1400px}
+.tpl{height:280px;position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.25,.8,.25,1);cursor:pointer}
+.tpl:hover,.tpl:focus-within{transform:rotateY(180deg)}
+.tpl-face{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;border:1px solid var(--border);padding:1.4rem;display:flex;flex-direction:column}
+.tpl-front{background:linear-gradient(165deg,rgba(255,255,255,.08),rgba(255,255,255,.02));justify-content:space-between}
+.tpl-front .glyph{font-size:2.1rem}
+.tpl-front h3{font-family:var(--syne);font-size:1.12rem;margin:.4rem 0 .2rem}
+.tpl-front p{color:var(--muted);font-size:.82rem}
+.tpl-front .flip-hint{font-size:.72rem;color:var(--indigo-lt);font-weight:700;letter-spacing:.06em}
+.tpl-back{background:linear-gradient(165deg,rgba(109,94,247,.2),rgba(10,10,20,.9));transform:rotateY(180deg);justify-content:center;gap:.4rem}
+.tpl-back li{list-style:none;font-size:.8rem;color:var(--text);padding-left:1.1rem;position:relative;margin:.18rem 0}
+.tpl-back li::before{content:"✓";position:absolute;left:0;color:var(--teal);font-weight:700}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.4rem;counter-reset:step}
+.step{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:2rem 1.6rem;position:relative}
+.step::before{counter-increment:step;content:"0" counter(step);font-family:var(--syne);font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,var(--indigo-lt),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;display:block;margin-bottom:.6rem}
+.step h3{font-family:var(--syne);font-size:1.1rem;margin-bottom:.4rem}
+.step p{color:var(--muted);font-size:.92rem}
+
+/* Compare table */
+.cmp{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:var(--panel)}
+.cmp th,.cmp td{padding:1rem 1.2rem;text-align:left;font-size:.94rem;border-bottom:1px solid var(--border)}
+.cmp tr:last-child td{border-bottom:none}
+.cmp th{font-family:var(--syne);background:rgba(109,94,247,.12)}
+.cmp td.yes{color:var(--teal);font-weight:700}
+.cmp td.no{color:#f87171}
+.cmp td:first-child{color:var(--muted)}
+
+/* Testimonials */
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem}
+.quote{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:1.8rem}
+.quote p{font-size:.98rem;margin-bottom:1rem}
+.quote .who{color:var(--muted);font-size:.85rem}
+.quote .stars{color:var(--amber);letter-spacing:.12em;margin-bottom:.7rem}
+
+/* Pricing */
+.price-card{max-width:460px;margin:0 auto;background:linear-gradient(170deg,rgba(109,94,247,.16),rgba(255,255,255,.03));border:1px solid rgba(109,94,247,.4);border-radius:26px;padding:2.6rem 2.2rem;text-align:center;position:relative;box-shadow:0 30px 80px rgba(109,94,247,.22)}
+.price-card .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--amber),#f59e0b);color:#111;font-weight:800;font-size:.78rem;letter-spacing:.06em;padding:.35rem 1.1rem;border-radius:30px}
+.price-num{font-family:var(--syne);font-size:4rem;font-weight:800;color:var(--amber);line-height:1;margin:.8rem 0 .1rem}
+.price-per{color:var(--muted);margin-bottom:1.4rem}
+.price-card ul{list-style:none;text-align:left;margin:0 auto 1.6rem;max-width:320px}
+.price-card li{padding:.4rem 0 .4rem 1.6rem;position:relative;font-size:.94rem}
+.price-card li::before{content:"✓";position:absolute;left:0;color:var(--teal);font-weight:800}
+
+/* FAQ */
+.faq{max-width:760px;margin:0 auto}
+.faq details{border:1px solid var(--border);border-radius:16px;background:var(--panel);margin-bottom:.9rem;overflow:hidden}
+.faq summary{padding:1.15rem 1.4rem;cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--syne);font-size:1.3rem;color:var(--indigo-lt);transition:var(--t)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq .a{padding:0 1.4rem 1.2rem;color:var(--muted);font-size:.95rem}
+
+/* Final CTA + footer */
+.final{text-align:center;background:linear-gradient(180deg,transparent,rgba(109,94,247,.1));border-radius:30px;padding:4.5rem 2rem;border:1px solid var(--border)}
+footer{border-top:1px solid var(--border);padding:2.4rem 0;color:var(--muted);font-size:.88rem}
+.foot-inner{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+footer a{color:var(--indigo-lt);text-decoration:none}
+
+.sticky-cta{position:fixed;bottom:1.4rem;right:1.4rem;z-index:90;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;text-decoration:none;font-weight:700;padding:.85rem 1.5rem;border-radius:40px;box-shadow:0 14px 34px rgba(109,94,247,.5);transition:var(--t);font-size:.92rem}
+.sticky-cta:hover{transform:translateY(-3px) scale(1.03)}
+
+/* Reveal on scroll */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .cv-scene{height:420px;margin-top:1rem}
+  .nav-links a:not(.btn){display:none}
+}
+@media (max-width:560px){
+  section{padding:3.6rem 0}
+  .cv-c2{display:none}
+  .sticky-cta{left:1rem;right:1rem;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="orb orb-a" aria-hidden="true"></div>
+<div class="orb orb-b" aria-hidden="true"></div>
+<div class="orb orb-c" aria-hidden="true"></div>
+
+<nav aria-label="Main navigation">
+  <div class="nav-inner">
+    <a class="logo" href="#top">⚓ Anchor<span>CV</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#templates">Templates</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="https://app.anchorcv.com/login" target="_blank" rel="noopener">Try it free →</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+<!-- ═══ HERO ═══ -->
+<header class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> Now powered by GPT-4o &amp; Claude</span>
+      <h1>Your CV, rebuilt to <span class="grad">world-class standards.</span></h1>
+      <p class="hero-sub">
+        The only AI career platform that <strong>shows its work</strong> — evidence-anchored
+        match scores, ATS checks, cover letters, and CV formats trusted by the
+        World Bank, ADB, immigration officers, law firms, and executive recruiters.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary btn-lg" href="https://app.anchorcv.com/login" target="_blank" rel="noopener">Analyze my CV free →</a>
+        <a class="btn btn-outline btn-lg" href="#templates">See the templates</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>9/10</b><span>output quality, multi-stage gates</span></div>
+        <div class="stat"><b>5</b><span>institutional CV formats</span></div>
+        <div class="stat"><b>2</b><span>AI engines — you choose</span></div>
+        <div class="stat"><b>$9</b><span>per 3-month season</span></div>
+      </div>
+    </div>
+
+    <div class="cv-scene" id="scene" aria-hidden="true">
+      <div class="cv-stack" id="stack">
+        <div class="cv-card cv-c1">
+          <h4>📊 Job Match Score</h4>
+          <div class="score-ring"><b>85</b></div>
+          <div style="text-align:center;color:var(--muted);font-size:.78rem;margin-bottom:.6rem">Strong match — 3 gaps found</div>
+          <div class="bar"><i style="width:88%"></i></div>
+          <div class="bar"><i style="width:74%;animation-delay:.3s"></i></div>
+          <div class="bar"><i style="width:91%;animation-delay:.6s"></i></div>
+        </div>
+        <div class="cv-card cv-c2">
+          <h4>🏛️ World Bank Format</h4>
+          <div class="line"></div><div class="line short"></div>
+          <div class="line"></div><div class="line short"></div>
+          <div class="line"></div>
+        </div>
+        <div class="cv-card cv-c3">
+          <h4>✉️ Cover Letter</h4>
+          <div class="line"></div><div class="line"></div>
+          <div class="line short"></div><div class="line"></div>
+        </div>
+      </div>
+      <span class="chip-3d chip-ats">🛡️ ATS: PASSED</span>
+      <span class="chip-3d chip-wb">🏛️ World Bank · ADB ready</span>
+      <span class="chip-3d chip-ai">⚡ GPT-4o / Claude</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ FEATURES ═══ -->
+<section id="features" class="wrap">
+  <div class="sec-head rv">
+    <span class="kicker">Everything in one canvas</span>
+    <h2>What AnchorCV does for you</h2>
+    <p>A guided, step-by-step canvas takes you from raw CV to submitted application — no blank-page anxiety, no generic AI fluff.</p>
+  </div>
+  <div class="feat-grid">
+    <article class="tilt rv"><div class="ico">🎯</div><h3>Evidence-Anchored Analysis</h3><p>Match scores, gap matrices, and rewrites built only from what's actually in your CV. Nothing invented, everything verifiable.</p><span class="tag">Core</span></article>
+    <article class="tilt rv"><div class="ico">🛡️</div><h3>ATS Shield</h3><p>Simulates automated screening before recruiters ever see your CV. Formatting traps, missing keywords, parse errors — caught and fixed.</p><span class="tag">Beat the bots</span></article>
+    <article class="tilt rv"><div class="ico">🏛️</div><h3>World-Class Templates</h3><p>Convert your CV into World Bank, ADB, immigration, legal, or executive formats — or score it against their standards to see what's missing.</p><span class="tag">New</span></article>
+    <article class="tilt rv"><div class="ico">⚡</div><h3>Choose Your AI Engine</h3><p>GPT-4o for speed, Claude for exceptional writing. Switch engines per task — the only CV platform that lets you pick.</p><span class="tag">New</span></article>
+    <article class="tilt rv"><div class="ico">✉️</div><h3>Letters Professors Answer</h3><p>Cover letters and cold emails tailored to the exact role or program — passed through anti-detection and read-aloud quality gates.</p><span class="tag">Quality gated</span></article>
+    <article class="tilt rv"><div class="ico">🗺️</div><h3>Discovery &amp; Job Search</h3><p>Map scholarships, PhD programs, and job markets by intent, then jump straight into analysis with requirements pre-filled.</p><span class="tag">Explore</span></article>
+    <article class="tilt rv"><div class="ico">📄</div><h3>First Resume Builder</h3><p>No CV yet? Build one from scratch with drag-and-drop sections, live preview, and AI enhancement — export to PDF or DOCX.</p><span class="tag">Students</span></article>
+    <article class="tilt rv"><div class="ico">🔁</div><h3>One CV, Every Flow</h3><p>Upload once, reuse everywhere. Your CV follows you across analysis, templates, and letters — replace it in one click, anytime.</p><span class="tag">Seamless</span></article>
+  </div>
+</section>
+
+<!-- ═══ TEMPLATES ═══ -->
+<section id="templates" class="wrap">
+  <div class="sec-head rv">
+    <span class="kicker">Flip a card to see the standards</span>
+    <h2>CV formats the world's institutions expect</h2>
+    <p>Generic CVs lose to targeted ones. Convert yours into the exact structure reviewers score against — or get a gap report first.</p>
+  </div>
+  <div class="tpl-row">
+    <div class="tpl rv" tabindex="0"><div class="tpl-face tpl-front"><span class="glyph">🏛️</span><div><h3>World Bank CV</h3><p>WBG, IFC &amp; MIGA applications</p></div><span class="flip-hint">Hover to flip ↻</span></div><ul class="tpl-face tpl-back"><li>Assignment-by-assignment record</li><li>Client &amp; funder named on every project</li><li>Countries of work experience</li><li>Quantified outcomes &amp; budgets</li></ul></div>
+    <div class="tpl rv" tabindex="0"><div class="tpl-face tpl-front"><span class="glyph">🌏</span><div><h3>ADB Consultant CV</h3><p>Asian Development Bank CMS format</p></div><span class="flip-hint">Hover to flip ↻</span></div><ul class="tpl-face tpl-back"><li>Mirrors ADB's CMS fields</li><li>"Work undertaken" evidence section</li><li>TOR-matched assignments</li><li>Asia-Pacific experience highlighted</li></ul></div>
+    <div class="tpl rv" tabindex="0"><div class="tpl-face tpl-front"><span class="glyph">🛂</span><div><h3>Immigration CV</h3><p>Global Talent, EB-1/2, Express Entry</p></div><span class="flip-hint">Hover to flip ↻</span></div><ul class="tpl-face tpl-back"><li>Zero unexplained gaps</li><li>Occupation-code aligned duties</li><li>Exact month/year dates</li><li>Evidence-backed achievements</li></ul></div>
+    <div class="tpl rv" tabindex="0"><div class="tpl-face tpl-front"><span class="glyph">⚖️</span><div><h3>Lawyer CV</h3><p>Firms, in-house, clerkships, courts</p></div><span class="flip-hint">Hover to flip ↻</span></div><ul class="tpl-face tpl-back"><li>Bar &amp; court admissions up top</li><li>Matter descriptions with outcomes</li><li>Confidentiality-safe phrasing</li><li>Zero-typo precision</li></ul></div>
+    <div class="tpl rv" tabindex="0"><div class="tpl-face tpl-front"><span class="glyph">👔</span><div><h3>Executive CV</h3><p>C-suite, VP &amp; board applications</p></div><span class="flip-hint">Hover to flip ↻</span></div><ul class="tpl-face tpl-back"><li>Scope first: P&amp;L, headcount, markets</li><li>Career highlights with numbers</li><li>Board &amp; advisory roles</li><li>Two pages, ruthless focus</li></ul></div>
+  </div>
+  <div style="text-align:center;margin-top:2.4rem" class="rv">
+    <a class="btn btn-primary btn-lg" href="https://app.anchorcv.com/login" target="_blank" rel="noopener">Convert my CV to a template →</a>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section id="how" class="wrap">
+  <div class="sec-head rv">
+    <span class="kicker">Three steps, guided canvas</span>
+    <h2>How it works</h2>
+  </div>
+  <div class="steps">
+    <div class="step rv"><h3>Upload your CV once</h3><p>PDF, DOCX, or TXT. AnchorCV extracts it and carries it across every flow — analysis, templates, letters, ATS checks.</p></div>
+    <div class="step rv"><h3>Pick your goal</h3><p>Job application, scholarship, resume improvement, template conversion, or discovery. The canvas guides you step by step.</p></div>
+    <div class="step rv"><h3>Generate &amp; export</h3><p>Match scores, tailored letters, converted CVs — reviewed by quality gates, exported as PDF/DOCX, saved to your cloud.</p></div>
+  </div>
+</section>
+
+<!-- ═══ VS CHATGPT ═══ -->
+<section class="wrap">
+  <div class="sec-head rv">
+    <span class="kicker">The honest comparison</span>
+    <h2>AnchorCV vs generic AI chat</h2>
+  </div>
+  <div class="rv" style="overflow-x:auto">
+  <table class="cmp">
+    <tr><th></th><th>AnchorCV</th><th>ChatGPT / generic chat</th></tr>
+    <tr><td>Invents experience you don't have</td><td class="yes">Never — evidence-anchored</td><td class="no">Frequently</td></tr>
+    <tr><td>Institutional formats (World Bank, ADB, legal…)</td><td class="yes">Built-in, structure-exact</td><td class="no">Approximated from memory</td></tr>
+    <tr><td>ATS simulation before you apply</td><td class="yes">ATS Shield included</td><td class="no">No</td></tr>
+    <tr><td>Multi-stage quality gates on every letter</td><td class="yes">Yes — 9/10 rated pipeline</td><td class="no">Single pass</td></tr>
+    <tr><td>Choice of AI engine</td><td class="yes">GPT-4o or Claude</td><td class="no">One model</td></tr>
+    <tr><td>Guided flow with export &amp; cloud save</td><td class="yes">Canvas + PDF/DOCX</td><td class="no">Copy-paste yourself</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="wrap">
+  <div class="sec-head rv">
+    <span class="kicker">Real results</span>
+    <h2>From applicants like you</h2>
+  </div>
+  <div class="quotes">
+    <div class="quote rv"><div class="stars">★★★★★</div><p>"The gap matrix showed me exactly why I wasn't getting interviews. Fixed three bullets, got two callbacks the same week."</p><div class="who">— Master's student, Germany</div></div>
+    <div class="quote rv"><div class="stars">★★★★★</div><p>"Converted my CV to the World Bank format for a consultancy roster. The structure was exactly what the TOR asked for."</p><div class="who">— Development economist, Pakistan</div></div>
+    <div class="quote rv"><div class="stars">★★★★★</div><p>"The professor email actually got a reply. Three emails I wrote myself never did. That alone was worth the $9."</p><div class="who">— PhD applicant, Canada</div></div>
+  </div>
+</section>
+
+<!-- ═══ PRICING ═══ -->
+<section id="pricing" class="wrap">
+  <div class="sec-head rv">
+    <span class="kicker">One price, no traps</span>
+    <h2>Priced for students, not corporations</h2>
+    <p>A whole application season for less than one coffee a month.</p>
+  </div>
+  <div class="price-card rv">
+    <span class="badge">SEASON PASS</span>
+    <div class="price-num">$9</div>
+    <div class="price-per">for 3 full months · no auto-renewal surprises</div>
+    <ul>
+      <li>Unlimited CV analysis &amp; match scores</li>
+      <li>All 5 world-class templates — convert &amp; compare</li>
+      <li>ATS Shield screening simulation</li>
+      <li>Cover letters, statements &amp; professor emails</li>
+      <li>GPT-4o and Claude — switch anytime</li>
+      <li>Discovery, job search &amp; first-resume builder</li>
+      <li>PDF/DOCX export + cloud file storage</li>
+    </ul>
+    <a class="btn btn-primary btn-lg" style="width:100%" href="https://app.anchorcv.com/login" target="_blank" rel="noopener">Get 3-Month Access — $9 →</a>
+    <div style="margin-top:.9rem;font-size:.82rem;color:var(--muted)">Try the analyzer free before you pay.</div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section id="faq" class="wrap">
+  <div class="sec-head rv"><span class="kicker">Questions</span><h2>Answered honestly</h2></div>
+  <div class="faq rv">
+    <details><summary>How is AnchorCV different from ChatGPT?</summary><div class="a">AnchorCV never invents experience. Every rewrite, score, and suggestion is anchored to evidence found in your actual CV, then passed through multi-stage quality gates (anti-detection, read-aloud, factual audits). You also choose the engine: GPT-4o or Claude.</div></details>
+    <details><summary>Which CV templates are included?</summary><div class="a">World Bank CV, ADB Consultant CV (CMS format), Immigration/Visa CV for points-based systems, Lawyer/Legal CV, and Executive CV. Convert your CV into any of them, or run a compare-and-score to get a section-by-section gap report first.</div></details>
+    <details><summary>Will my CV pass ATS screening?</summary><div class="a">ATS Shield simulates automated screening the way real systems parse your CV — flagging formatting traps, missing keywords, and parse failures, with concrete fixes before you apply.</div></details>
+    <details><summary>What does it cost?</summary><div class="a">$9 per 3-month application season. Renew only when you need it — no auto-billing surprises. You can try the analyzer free before paying.</div></details>
+    <details><summary>Is my CV data safe?</summary><div class="a">Your CV is processed securely, used only to generate your results, and never used to train models or shared with third parties. You can delete your files anytime.</div></details>
+    <details><summary>I don't have a CV yet — can I still use it?</summary><div class="a">Yes. The First Resume builder creates one from scratch: guided sections, drag-and-drop ordering, live preview, AI enhancement, and PDF/DOCX export.</div></details>
+  </div>
+</section>
+
+<!-- ═══ FINAL CTA ═══ -->
+<section class="wrap">
+  <div class="final rv">
+    <h2>Your next application deserves better than a template from 2015.</h2>
+    <p style="color:var(--muted);max-width:520px;margin:0 auto 2rem">Upload your CV, pick a goal, and watch AnchorCV build you an application that reviewers actually score well.</p>
+    <a class="btn btn-primary btn-lg" href="https://app.anchorcv.com/login" target="_blank" rel="noopener">Start free — analyze my CV →</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>⚓ <strong>AnchorCV</strong> — evidence-anchored career intelligence · © 2026</div>
+    <div><a href="https://app.anchorcv.com/login" target="_blank" rel="noopener">Open the app</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:zainzia1992@gmail.com">Contact</a></div>
+  </div>
+</footer>
+
+<a class="sticky-cta" href="https://app.anchorcv.com/login" target="_blank" rel="noopener">✨ Get 3-Month Access — $9 →</a>
+
+<script>
+// ── Starfield background ──────────────────────────
+const cv=document.getElementById('stars'),cx=cv.getContext('2d');
+let W,H,stars=[];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sizeCanvas(){W=cv.width=innerWidth;H=cv.height=innerHeight;
+  stars=Array.from({length:Math.min(140,W/9)},()=>({x:Math.random()*W,y:Math.random()*H,z:Math.random()*1+0.3,r:Math.random()*1.4+0.3}));}
+sizeCanvas();addEventListener('resize',sizeCanvas);
+(function draw(){cx.clearRect(0,0,W,H);
+  for(const s of stars){cx.globalAlpha=0.25+s.z*0.4;cx.fillStyle='#8b7ff9';
+    cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill();
+    if(!reduced){s.y+=s.z*0.12;if(s.y>H)s.y=-2;}}
+  if(!reduced)requestAnimationFrame(draw);})();
+
+// ── Hero 3D mouse parallax ────────────────────────
+const stack=document.getElementById('stack'),scene=document.getElementById('scene');
+if(!reduced&&scene){addEventListener('mousemove',e=>{
+  const r=scene.getBoundingClientRect();if(r.top>innerHeight||r.bottom<0)return;
+  const dx=(e.clientX/innerWidth-0.5),dy=(e.clientY/innerHeight-0.5);
+  stack.style.transform=`rotateY(${dx*14}deg) rotateX(${-dy*10}deg)`;});}
+
+// ── Tilt cards ────────────────────────────────────
+document.querySelectorAll('.tilt').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    card.style.setProperty('--mx',`${x*100}%`);card.style.setProperty('--my',`${y*100}%`);
+    if(!reduced)card.style.transform=`rotateY(${(x-0.5)*10}deg) rotateX(${(0.5-y)*8}deg) translateZ(6px)`;});
+  card.addEventListener('mouseleave',()=>{card.style.transform='';});});
+
+// ── Scroll reveals ────────────────────────────────
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:0.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

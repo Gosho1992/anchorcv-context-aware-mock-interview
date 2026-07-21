@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "AnchorCV",
+  "version": "1.0.0",
+  "description": "Generate cover letters and emails powered by AI, tailored to any job description",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "scripting",
+    "contextMenus",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://app.anchorcv.com/*"
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AnchorCV"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

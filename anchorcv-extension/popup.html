@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnchorCV</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 380px;
+      min-height: 500px;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 16px;
+      font-size: 14px;
+    }
+
+    /* Utility Classes */
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Headers */
+    h1 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 12px 0 8px 0;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    /* Form Elements */
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    textarea {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 10px;
+      border-radius: 8px;
+      width: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #818cf8;
+      box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    input[type="file"] {
+      color: #e2e8f0;
+      font-size: 13px;
+    }
+
+    /* Buttons */
+    button {
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    button.primary {
+      background: #818cf8;
+      color: white;
+      padding: 10px 20px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: #6366f1;
+    }
+
+    button.primary:disabled {
+      background: #4c1d95;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #1e293b;
+      color: #818cf8;
+      border: 1px solid #818cf8;
+      padding: 8px 16px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    button.secondary:hover:not(:disabled) {
+      background: #334155;
+    }
+
+    button.secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .button-group button {
+      flex: 1;
+      min-width: 140px;
+      margin-bottom: 0;
+    }
+
+    /* Messages */
+    .error {
+      background: #7f1d1d;
+      color: #fca5a5;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      border: 1px solid #991b1b;
+    }
+
+    .success {
+      background: #14532d;
+      color: #86efac;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      border: 1px solid #15803d;
+    }
+
+    .info {
+      background: #1e3a8a;
+      color: #93c5fd;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      border: 1px solid #1e40af;
+    }
+
+    /* Header bar */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .header-bar h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .header-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .user-email {
+      color: #94a3b8;
+    }
+
+    .logout-btn {
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+      width: auto !important;
+      margin: 0 !important;
+    }
+
+    /* Login Screen */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .login-link a {
+      color: #818cf8;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* CV Section */
+    .cv-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .cv-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .cv-ready {
+      color: #86efac;
+      font-size: 13px;
+    }
+
+    .cv-ready .check {
+      margin-right: 4px;
+    }
+
+    .replace-link {
+      color: #818cf8;
+      text-decoration: none;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .replace-link:hover {
+      text-decoration: underline;
+    }
+
+    /* JD Textarea */
+    .jd-section {
+      margin-bottom: 16px;
+    }
+
+    .jd-section textarea {
+      min-height: 120px;
+    }
+
+    .jd-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .jd-actions button {
+      flex: 1;
+      padding: 6px 8px;
+      font-size: 12px;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+
+    .jd-actions button:hover {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    /* Generate buttons - side by side, distinct colours */
+    .generate-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .generate-buttons button {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 13px;
+    }
+
+    #generate-cover-letter-button {
+      background: #818cf8;
+      color: white;
+      border: none;
+    }
+
+    #generate-cover-letter-button:hover:not(:disabled) {
+      background: #6366f1;
+    }
+
+    #generate-email-button {
+      background: #0ea5e9;
+      color: white;
+      border: none;
+    }
+
+    #generate-email-button:hover:not(:disabled) {
+      background: #0284c7;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Usage Counter */
+    .usage-counter {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .usage-counter.low {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fca5a5;
+    }
+
+    /* Result Screen */
+    .result-content {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .back-button {
+      background: #1e293b;
+      color: #818cf8;
+      border: 1px solid #334155;
+      padding: 8px 12px;
+      width: auto;
+      margin-bottom: 0;
+    }
+
+    .back-button:hover {
+      background: #334155;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      border: 2px solid #334155;
+      border-top: 2px solid #818cf8;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Upgrade Link */
+    .upgrade-link {
+      color: #818cf8;
+      text-decoration: none;
+      font-size: 13px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .upgrade-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Helper Styles */
+    .margin-top {
+      margin-top: 12px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-muted {
+      color: #94a3b8;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="screen-login" class="screen active">
+    <h1>AnchorCV</h1>
+
+    <div id="login-error"></div>
+
+    <div class="login-form">
+      <input
+        type="email"
+        id="login-email"
+        placeholder="Email"
+        required
+      >
+      <input
+        type="password"
+        id="login-password"
+        placeholder="Password"
+        required
+      >
+      <button class="primary" id="login-button">Login</button>
+    </div>
+
+    <div class="login-link">
+      No account?
+      <a href="https://app.anchorcv.com/signup" target="_blank">Sign up at anchorcv.com</a>
+    </div>
+  </div>
+
+  <!-- Main Screen -->
+  <div id="screen-main" class="screen">
+    <div class="header-bar">
+      <h1>AnchorCV</h1>
+      <div class="header-bar-right">
+        <span class="user-email" id="main-user-email"></span>
+        <button class="secondary logout-btn" id="logout-button">Logout</button>
+      </div>
+    </div>
+
+    <div id="main-error"></div>
+    <div id="main-success"></div>
+
+    <!-- CV Section -->
+    <div class="cv-section">
+      <h2>Your CV</h2>
+      <div id="cv-upload-area">
+        <input type="file" id="cv-file-input" accept=".pdf,.docx,.txt" style="margin-bottom: 0;">
+        <button class="secondary" id="cv-upload-button" style="width: 100%;">Upload CV</button>
+      </div>
+      <div id="cv-ready-area" style="display: none;">
+        <div class="cv-status">
+          <span class="cv-ready"><span class="check">✓</span>CV ready: <span id="cv-filename"></span></span>
+          <a class="replace-link" id="replace-cv-link">Replace</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- JD Section -->
+    <div class="jd-section">
+      <h2>Job Description or Requirements</h2>
+      <div class="jd-actions">
+        <button id="extract-jd-button">⚡ Extract from Page</button>
+        <button id="clear-button">🗑 Clear All</button>
+      </div>
+      <textarea id="jd-textarea" placeholder="Paste the job description or requirements here..." rows="7"></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="generate-buttons">
+      <button id="generate-cover-letter-button">📄 Cover Letter</button>
+      <button id="generate-email-button">✉ Email to Professor</button>
+    </div>
+
+    <!-- Usage Counter -->
+    <div class="usage-counter" id="usage-counter">
+      <span id="usage-text">X/3 free uses today</span>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="screen-result" class="screen">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h1 style="margin: 0;">Result</h1>
+      <button class="back-button" id="back-button">← Back</button>
+    </div>
+
+    <div id="result-error"></div>
+
+    <div class="result-content" id="result-text"></div>
+
+    <div class="result-actions">
+      <button class="primary" id="copy-button">Copy to Clipboard</button>
+      <button class="primary" id="insert-button">Try to Insert into Page</button>
+    </div>
+
+    <div id="result-feedback"></div>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
