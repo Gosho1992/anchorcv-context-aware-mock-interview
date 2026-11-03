@@ -465,15 +465,20 @@ def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
     target = otari_target(role)
     kwargs["model"] = target
 
-    # GPT-OSS can spend too much of a small output budget on reasoning.
-    # Use low reasoning effort by default, but respect an explicit setting.
-    # The guard role skips it: its provider rejects the parameter.
+    # GPT-OSS can spend too much of a small output budget on reasoning, so
+    # roles served by it send low reasoning effort and JSON mode. Roles whose
+    # models reject those parameters (OTARI_OPTIONAL_PARAM_ROLES) never send
+    # them: inside a routing policy a rejected parameter would count as a
+    # provider failure and push every request to the fallback model.
     extra_body = dict(kwargs.get("extra_body") or {})
-    if role != ROLE_GUARD:
+    if role in settings.otari_optional_param_roles:
         extra_body.setdefault(
             "reasoning_effort",
             OTARI_DEFAULT_REASONING_EFFORT,
         )
+    else:
+        extra_body.pop("reasoning_effort", None)
+        kwargs.pop("response_format", None)
     if guardrail:
         entries = guardrail_entries()
         if entries:

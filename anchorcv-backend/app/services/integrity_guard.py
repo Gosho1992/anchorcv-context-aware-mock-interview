@@ -36,7 +36,8 @@ MAX_INPUT_CHARS = 24000
 
 # (pattern, weight, label). Weight >= 1.0 blocks on its own.
 _PATTERNS: list[tuple[re.Pattern, float, str]] = [
-    (re.compile(r"\b(ignore|disregard|forget|override)\b[^.\n]{0,40}\b(previous|prior|above|earlier|all|any|your|the)\b[^.\n]{0,25}\b(instructions?|prompts?|rules|guidelines|directions)\b", re.I), 1.0, "instruction override"),
+    (re.compile(r"\b(ignore|disregard|forget|override)\b[^.\n]{0,12}\b(previous|prior|above|earlier|all|any|your|the|these|my)\b[^.\n]{0,25}\b(instructions?|prompts?|rules|guidelines|directions|rubric)\b", re.I), 1.0, "instruction override"),
+    (re.compile(r"\b(rubric|scoring|grading)\s+(override|bypass)\b|\ball dimensions\s*=\s*10\b", re.I), 1.0, "score manipulation"),
     (re.compile(r"\b(rate|score|grade|mark|evaluate)\b[^.\n]{0,40}\b(me|this candidate|the candidate|this cv|this resume|this answer)\b[^.\n]{0,30}\b(10\s*/\s*10|100\s*/\s*100|100|perfect|maximum|highest|top)\b", re.I), 1.0, "score manipulation"),
     (re.compile(r"\b(give|assign|award)\b[^.\n]{0,25}\b(a\s+)?(perfect|full|maximum|max|highest|100|10/10)\b[^.\n]{0,15}\b(score|rating|marks?|grade)\b", re.I), 1.0, "score manipulation"),
     (re.compile(r"\b(you are now|from now on you are|act as|pretend to be)\b[^.\n]{0,40}\b(ai|assistant|model|recruiter|evaluator|system|gpt|llm)\b", re.I), 0.7, "role hijack"),

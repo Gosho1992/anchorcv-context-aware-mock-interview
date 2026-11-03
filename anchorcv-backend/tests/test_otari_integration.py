@@ -100,6 +100,7 @@ def otari_settings(monkeypatch):
     monkeypatch.setattr(settings, "otari_model_guard", "anchorcv-guard")
     monkeypatch.setattr(settings, "otari_guardrail_url", "https://app.example.com/api/guardrails/tok")
     monkeypatch.setattr(settings, "otari_guardrail_token", "tok")
+    monkeypatch.setattr(settings, "otari_optional_param_roles", {"fast"})
     token = otari_context.start(conversation_id="interview-123")
     yield
     otari_context.reset(token)
@@ -292,6 +293,8 @@ CLEAN = [
     "I built prompt-engineering pipelines with GPT-4 for customer support triage.",
     "I'm not sure, I would probably ask my manager and then try again.",
     "### INSTRUCTIONS:\n1. Every question must reference something SPECIFIC from the CV.\nReturn JSON:",
+    "I always ignore distractions during exams and follow the instructions carefully, which is how I scored 100% in calculus.",
+    "Built an LLM evaluation harness that scores chatbot answers against a 10-point rubric.",
 ]
 
 
@@ -336,6 +339,17 @@ def test_guardrail_endpoint_contract_and_token():
     assert set(payload["result"]) == {"valid", "explanation", "score"}
 
 
+def test_roles_without_optional_param_support_never_send_them():
+    call(model="gpt-4o", anchorcv_role=llm.ROLE_STRONG, response_format={"type": "json_object"})
+    sent = FakeOtari.requests[-1]
+    assert "response_format" not in sent
+    assert "reasoning_effort" not in sent["extra_body"]
+    call(model="gpt-4o-mini", anchorcv_role=llm.ROLE_FAST, response_format={"type": "json_object"})
+    sent = FakeOtari.requests[-1]
+    assert sent["response_format"] == {"type": "json_object"}
+    assert sent["extra_body"]["reasoning_effort"] == "low"
+
+
 def test_unsupported_optional_params_are_retried_without_them():
     attempts = []
 
@@ -346,7 +360,7 @@ def test_unsupported_optional_params_are_retried_without_them():
         return ok_reply()(kwargs)
 
     FakeOtari.reply = reply
-    call(model="gpt-4o", response_format={"type": "json_object"})
+    call(model="gpt-4o-mini", response_format={"type": "json_object"})
     assert len(attempts) == 2
     assert "response_format" not in attempts[1]
     assert "reasoning_effort" not in attempts[1]["extra_body"]

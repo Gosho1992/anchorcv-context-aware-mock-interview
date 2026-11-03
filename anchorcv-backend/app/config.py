@@ -52,6 +52,16 @@ class Settings:
             "OTARI_MODEL_GUARD", "openai/gpt-oss-safeguard-120b"
         ).strip()
 
+        # Roles whose Otari models accept the optional parameters
+        # response_format and reasoning_effort (gpt-oss does; Llama and the
+        # safeguard model do not). Other roles never send them, so a routing
+        # policy does not fail over just because a model rejects a parameter.
+        self.otari_optional_param_roles = {
+            role.strip()
+            for role in os.getenv("OTARI_OPTIONAL_PARAM_ROLES", "fast").split(",")
+            if role.strip()
+        }
+
         # Per-user budgets: an Otari *service key* bills each AnchorCV user as
         # an Otari end user with their own budget. Without it, every request is
         # billed to OTARI_API_KEY's own user.

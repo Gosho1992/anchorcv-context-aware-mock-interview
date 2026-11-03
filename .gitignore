@@ -98,3 +98,7 @@ test_all.py
 test_cv.pdf
 test_cv.txt
 test_jd.txt
+
+# Benchmark scratch runs (the final report is committed explicitly)
+anchorcv-backend/eval/reports/*
+!anchorcv-backend/eval/reports/.gitkeep
