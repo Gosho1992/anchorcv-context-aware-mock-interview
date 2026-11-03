@@ -303,7 +303,10 @@ def _feature_per_user_budget(h, results_by_id):
         calls = (r["data"].get("otari") or {}).get("calls", [])
         evidence["trial_user_status"] = r["status"]
         evidence["trial_user_budget"] = next((c.get("end_user_budget") for c in calls if c.get("end_user_budget")), None)
-        trial_ok = r["status"] == 200 and evidence["trial_user_budget"] == h.settings.otari_budget_trial
+        from app.services import llm as _llm
+        expected = _llm._end_user_budget_for("trial")
+        evidence["expected_trial_budget_id"] = expected
+        trial_ok = r["status"] == 200 and evidence["trial_user_budget"] == expected
 
         zero = os.getenv("OTARI_END_USER_BUDGET_ZERO", "").strip()
         zero_ok = None

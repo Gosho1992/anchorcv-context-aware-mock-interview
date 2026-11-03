@@ -101,6 +101,8 @@ def otari_settings(monkeypatch):
     monkeypatch.setattr(settings, "otari_guardrail_url", "https://app.example.com/api/guardrails/tok")
     monkeypatch.setattr(settings, "otari_guardrail_token", "tok")
     monkeypatch.setattr(settings, "otari_optional_param_roles", {"fast"})
+    llm._budget_ids.clear()
+    llm._budget_ids.update({"anchorcv-trial": "anchorcv-trial", "anchorcv-season-pass": "anchorcv-season-pass"})
     token = otari_context.start(conversation_id="interview-123")
     yield
     otari_context.reset(token)
@@ -370,3 +372,26 @@ def test_unsupported_optional_params_are_retried_without_them():
 def test_guard_role_sends_no_reasoning_effort():
     call(model="otari:fast", anchorcv_role=llm.ROLE_GUARD)
     assert "reasoning_effort" not in FakeOtari.requests[-1]["extra_body"]
+
+
+def test_budget_names_resolve_to_ids_once(monkeypatch):
+    llm._budget_ids.clear()
+    lookups = []
+
+    class FakeHttp:
+        def __init__(self, **kw): pass
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def get(self, url, headers):
+            lookups.append(url)
+            return SimpleNamespace(
+                raise_for_status=lambda: None,
+                json=lambda: [{"name": "anchorcv-trial", "budget_id": "5ad5bc61-33f6-40ac-972a-9424209b455b"}],
+            )
+
+    monkeypatch.setattr(llm.httpx, "Client", FakeHttp)
+    monkeypatch.setattr(settings, "otari_service_key", "otari-service-key")
+    assert llm._end_user_budget_for("trial") == "5ad5bc61-33f6-40ac-972a-9424209b455b"
+    assert llm._end_user_budget_for("trial") == "5ad5bc61-33f6-40ac-972a-9424209b455b"
+    assert len(lookups) == 1
+    assert llm._resolve_budget_id("f9728fce-6b7f-4b81-9852-87b8b46a2686") == "f9728fce-6b7f-4b81-9852-87b8b46a2686"

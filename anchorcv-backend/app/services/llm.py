@@ -34,6 +34,8 @@ and records what Otari reports back (served model, fallback, cost, latency).
 from __future__ import annotations
 
 import logging
+import re
+import threading
 import time
 from types import SimpleNamespace
 from urllib.parse import quote
@@ -376,12 +378,55 @@ def guardrail_entries() -> list[dict]:
     }]
 
 
+_budget_ids: dict[str, str] = {}
+_budget_ids_lock = threading.Lock()
+_UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
+
+
+def _resolve_budget_id(value: str) -> str:
+    """Otari wants a budget's id in Otari-End-User-Budget; .env may hold its name.
+
+    The dashboard generates ids it never shows, so AnchorCV accepts the
+    budget's name and looks the id up once on the service key's budget list.
+    """
+    if not value or _UUID_RE.match(value):
+        return value
+    with _budget_ids_lock:
+        if value in _budget_ids:
+            return _budget_ids[value]
+    try:
+        with httpx.Client(timeout=15.0) as client:
+            response = client.get(
+                f"{settings.otari_base_url}/end-user-budgets",
+                headers={
+                    "Authorization": f"Bearer {settings.otari_service_key}",
+                    "User-Agent": OTARI_USER_AGENT,
+                },
+            )
+        response.raise_for_status()
+        found = {
+            str(item.get("name")): str(item.get("budget_id"))
+            for item in response.json()
+            if item.get("name") and item.get("budget_id")
+        }
+    except (httpx.HTTPError, ValueError, TypeError) as exc:
+        logger.warning("Could not list Otari end-user budgets: %s", exc)
+        return value
+    with _budget_ids_lock:
+        _budget_ids.update(found)
+        if value not in _budget_ids:
+            logger.warning("Otari end-user budget %r is not on the service key's list", value)
+        return _budget_ids.get(value, value)
+
+
 def _end_user_budget_for(tier: str | None) -> str | None:
     if tier == "premium":
-        return settings.otari_budget_premium or None
-    if tier == "trial":
-        return settings.otari_budget_trial or None
-    return None
+        name = settings.otari_budget_premium
+    elif tier == "trial":
+        name = settings.otari_budget_trial
+    else:
+        return None
+    return _resolve_budget_id(name) if name else None
 
 
 def _header(headers, name: str):
