@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -6,9 +6,15 @@ from app.routers import (
     analysis, auth, builder, export, files, matching,
     navigate, payments, extension, webhook, discovery, first_resume, jobs,
     ats_shield, analytics, models, templates, interview, resume_defense,
+    guardrails,
 )
+from app.services.llm import OtariPolicyError
+from app.services.otari_context import OtariContextMiddleware
+from app.services.otari_errors import otari_policy_error
 
 app = FastAPI(title=settings.app_name)
+
+app.add_middleware(OtariContextMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,6 +23,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.add_exception_handler(OtariPolicyError, otari_policy_error)
 
 
 @app.get("/health")
@@ -44,4 +53,5 @@ app.include_router(templates.router, prefix=settings.api_prefix)
 app.include_router(interview.router, prefix=settings.api_prefix)
 
 app.include_router(resume_defense.router, prefix=settings.api_prefix)
+app.include_router(guardrails.router, prefix=settings.api_prefix)
 

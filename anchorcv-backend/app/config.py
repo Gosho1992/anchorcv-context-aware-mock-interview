@@ -39,6 +39,43 @@ class Settings:
                 "LLM_PROVIDER must be either 'native' or 'otari'."
             )
 
+        # Otari model roles. Each value is an Otari routing policy name
+        # (created in the Otari dashboard, with fallbacks) or a plain model id.
+        # Defaults are open-weight models so the app works before policies exist.
+        self.otari_model_fast = os.getenv(
+            "OTARI_MODEL_FAST", "openai/gpt-oss-20b"
+        ).strip()
+        self.otari_model_strong = os.getenv(
+            "OTARI_MODEL_STRONG", "openai/gpt-oss-120b"
+        ).strip()
+        self.otari_model_guard = os.getenv(
+            "OTARI_MODEL_GUARD", "openai/gpt-oss-safeguard-120b"
+        ).strip()
+
+        # Per-user budgets: an Otari *service key* bills each AnchorCV user as
+        # an Otari end user with their own budget. Without it, every request is
+        # billed to OTARI_API_KEY's own user.
+        self.otari_service_key = os.getenv("OTARI_SERVICE_KEY", "").strip()
+        self.otari_budget_trial = os.getenv(
+            "OTARI_END_USER_BUDGET_TRIAL", "anchorcv-trial"
+        ).strip()
+        self.otari_budget_premium = os.getenv(
+            "OTARI_END_USER_BUDGET_PREMIUM", "anchorcv-season-pass"
+        ).strip()
+
+        # Guardrails: Otari calls this AnchorCV endpoint before the model runs.
+        # It must be a public https URL, e.g.
+        # https://app.anchorcv.com/api/guardrails/<OTARI_GUARDRAIL_TOKEN>
+        self.otari_guardrail_url = os.getenv(
+            "OTARI_GUARDRAIL_URL", ""
+        ).strip().rstrip("/")
+        self.otari_guardrail_token = os.getenv(
+            "OTARI_GUARDRAIL_TOKEN", ""
+        ).strip()
+        self.otari_guardrail_profile = os.getenv(
+            "OTARI_GUARDRAIL_PROFILE", "anchorcv-integrity"
+        ).strip()
+
         # Database
         self.supabase_url = os.getenv("SUPABASE_URL", "")
         self.supabase_service_key = os.getenv("SUPABASE_SERVICE_KEY", "")

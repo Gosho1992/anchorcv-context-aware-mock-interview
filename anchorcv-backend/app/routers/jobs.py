@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from app.config import settings
 from app.deps.auth import require_active_access
+from app.services.llm import ROLE_STRONG, OtariPolicyError, get_routed_client
 from app.services.job_search import (
     build_query,
     search_jobs as search_jobs_service,
@@ -363,36 +364,34 @@ def _build_prompt(payload: GenerateDocumentRequest, skills, exp_level, responsib
 
 
 async def _call_claude(system: str, user_prompt: str) -> str:
-    api_key = settings.anthropic_api_key
-    if not api_key:
-        raise RuntimeError("Anthropic API is not configured (missing ANTHROPIC_API_KEY).")
+    """Generate with the strong writing model through the shared LLM router.
 
-    headers = {
-        "x-api-key": api_key,
-        "anthropic-version": ANTHROPIC_VERSION,
-        "content-type": "application/json",
-    }
-    body = {
-        "model": ANTHROPIC_MODEL,
-        "max_tokens": ANTHROPIC_MAX_TOKENS,
-        "system": system,
-        "messages": [{"role": "user", "content": user_prompt}],
-    }
+    Natively this is Claude Sonnet (as before); with LLM_PROVIDER=otari it is
+    the strong open-weight role through Otari.
+    """
+    def _run() -> str:
+        response = get_routed_client().chat.completions.create(
+            model=ANTHROPIC_MODEL,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_prompt},
+            ],
+            max_tokens=ANTHROPIC_MAX_TOKENS,
+            anchorcv_role=ROLE_STRONG,
+            anchorcv_task="job_document",
+        )
+        return (response.choices[0].message.content or "").strip()
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        response = await client.post(ANTHROPIC_API_URL, headers=headers, json=body)
-        response.raise_for_status()
-        data = response.json()
-
-    # Anthropic Messages API returns content as a list of blocks.
-    parts = [
-        block.get("text", "")
-        for block in data.get("content", [])
-        if block.get("type") == "text"
-    ]
-    text = "".join(parts).strip()
+    try:
+        text = await asyncio.to_thread(_run)
+    except OtariPolicyError:
+        raise
+    except RuntimeError:
+        raise
+    except Exception as exc:
+        raise ValueError(f"LLM call failed: {exc}") from exc
     if not text:
-        raise ValueError("Claude returned an empty response.")
+        raise ValueError("The model returned an empty response.")
     return text
 
 

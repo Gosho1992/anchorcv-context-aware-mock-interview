@@ -14,7 +14,7 @@ import logging
 import os
 from typing import Dict, List
 
-from openai import OpenAI
+from app.services.llm import get_routed_client, list_available_models
 
 logger = logging.getLogger(__name__)
 
@@ -81,18 +81,18 @@ def generate_improvements(resume_text: str, job_description: str,
     missing_keywords = missing_keywords or []
     formatting_issues = formatting_issues or []
 
-    api_key = os.getenv("OPENAI_API_KEY", "")
-    if not api_key:
-        logger.warning("ATS Shield: OPENAI_API_KEY not set; skipping LLM improvements.")
+    if not list_available_models():
+        logger.warning("ATS Shield: no LLM provider configured; skipping LLM improvements.")
         return []
 
     try:
-        client = OpenAI(api_key=api_key)
+        client = get_routed_client()
         user_prompt = _build_user_prompt(
             resume_text, job_description, missing_keywords, formatting_issues
         )
         response = client.chat.completions.create(
             model=MODEL,
+            anchorcv_task="ats_improvements",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

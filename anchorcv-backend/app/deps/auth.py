@@ -3,6 +3,7 @@ from fastapi import Cookie, Depends, HTTPException, status
 from app.config import settings
 from app.services import legacy_bridge
 from app.services.access_control import get_user_access_status
+from app.services import otari_context
 from anchor_shared import verify_session_token
 
 
@@ -18,6 +19,8 @@ def get_current_user(session_token: str | None = Cookie(default=None, alias=sett
     sanitized = legacy_bridge.sanitize_user(user)
     if not sanitized:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found.")
+    # Bill this user's LLM calls to their own Otari end user and budget.
+    otari_context.bind_user(sanitized, get_user_access_status(sanitized)["access"])
     return sanitized
 
 

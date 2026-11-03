@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Optional
 
 from app.deps.auth import get_current_user
+from app.services.llm import get_routed_client
 
 router = APIRouter(prefix="/navigate", tags=["navigate"])
 logger = logging.getLogger(__name__)
@@ -176,11 +177,12 @@ def get_navigation(
         + f"Premium: {ctx.is_premium}\n"
     )
 
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+    client = get_routed_client()
 
     try:
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
+            anchorcv_task="concierge",
             messages=[
                 {"role": "system", "content": _SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from app.deps.auth import get_current_user, require_active_access
 from app.services import legacy_bridge
 from app.services.serper_search import serper_search
+from app.services.llm import get_routed_client
 
 router = APIRouter(prefix="/discover", tags=["discovery"])
 logger = logging.getLogger(__name__)
@@ -667,11 +668,12 @@ def generate_landscape(
 
     system_prompt, user_prompt = _build_prompts(query, intent, resume_text)
 
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+    client = get_routed_client()
 
     try:
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
+            anchorcv_task="discovery_landscape",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -681,7 +683,7 @@ def generate_landscape(
             max_tokens=3000,
         )
     except Exception as exc:
-        logger.exception("OpenAI call failed for discovery query: %s", exc)
+        logger.exception("LLM call failed for discovery query: %s", exc)
         raise HTTPException(status_code=502, detail="Discovery service is temporarily unavailable.") from exc
 
     raw_text = (completion.choices[0].message.content or "").strip()
