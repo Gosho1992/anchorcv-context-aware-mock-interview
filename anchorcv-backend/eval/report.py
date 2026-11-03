@@ -112,6 +112,7 @@ def compute(config, results):
             "complete_question_sets_pct": _pct(len(full_sets), len(gens)),
             "evaluation_requests": len(evals),
             "evaluation_success_pct": _pct(len(eval_ok) + len(blocked), len(evals)),
+            "evaluations_scored": len(eval_ok), "evaluations_blocked_by_guardrail": len(blocked),
             "errors": [{"id": r["id"], "status": r.get("status"), "error": str(r.get("error"))[:200]}
                        for r in gens + evals if r.get("status") not in (200, 422)][:20],
             "fallbacks": fallbacks, "compat_retries": compat,
@@ -119,6 +120,7 @@ def compute(config, results):
 
         # Grounding
         q_total = q_grounded = q_bad_numbers = 0
+        bad_examples = []
         per_persona = {}
         for g in gen_ok:
             p = personas.get(g["persona"])
@@ -132,11 +134,14 @@ def compute(config, results):
                 grounded += hit
                 bad = [n for n in _numbers(q) if n not in source_numbers and len(n) > 1]
                 q_bad_numbers += bool(bad)
+                if bad:
+                    bad_examples.append({"persona": g["persona"], "numbers": bad, "question": q})
                 q_total += 1
             q_grounded += grounded
             per_persona[g["persona"]] = {"grounded": grounded, "total": len(g.get("questions") or [])}
         a["grounding"] = {"questions": q_total, "grounded_pct": _pct(q_grounded, q_total),
-                          "unsupported_number_pct": _pct(q_bad_numbers, q_total), "per_persona": per_persona}
+                          "unsupported_number_pct": _pct(q_bad_numbers, q_total), "per_persona": per_persona,
+                          "unsupported_number_examples": bad_examples}
 
         # Evaluator calibration (rep 0 only)
         scores = defaultdict(dict)
@@ -326,6 +331,29 @@ def render(metrics) -> str:
             return f"{r}× cheaper"
         return f"{round((1 / r - 1) * 100)}% more"
 
+    def counts_note():
+        parts = []
+        for arm in arms:
+            rel = metrics["arms"].get(arm, {}).get("reliability", {})
+            blocked = rel.get("evaluations_blocked_by_guardrail") or 0
+            txt = f"{ARM_LABEL.get(arm, arm)}: {rel.get('evaluations_scored')} answers scored"
+            if blocked:
+                txt += (f", {blocked} injected answers refused by the Otari guardrail before any model saw them "
+                        f"(HTTP 422), so they have no score")
+            parts.append(txt)
+        return "Both arms received the same " + str(metrics["arms"].get(arms[0], {}).get("reliability", {}).get("evaluation_requests")) + " evaluation requests. " + "; ".join(parts) + "."
+
+    def numbers_note():
+        rows = []
+        for arm in arms:
+            for ex in metrics["arms"].get(arm, {}).get("grounding", {}).get("unsupported_number_examples", []):
+                rows.append(f"<li><b>{html.escape(ARM_LABEL.get(arm, arm))}</b> · {html.escape(ex['persona'])} · "
+                            f"{html.escape(', '.join(ex['numbers']))}: “{html.escape(ex['question'][:220])}”</li>")
+        if not rows:
+            return ""
+        return ("<details><summary class='small'>Questions citing a number not in the CV/JD (review them: a hypothetical "
+                "scenario is fine, an invented fact about the candidate is not)</summary><ul class='small'>" + "".join(rows) + "</ul></details>")
+
     j, g = metrics["judge"], metrics["guardrail"]
     cards = f"""
 <div class="grid">
@@ -338,6 +366,7 @@ def render(metrics) -> str:
 
     quality = f"""
 <h2>1 · Quality and reliability</h2>
+<p class="small">{counts_note()}</p>
 <table><tr><th>Metric</th>{head}</tr>
 {_row('Question requests that succeeded', ['reliability', 'question_success_pct'], metrics, arms, '%')}
 {_row('Complete question sets (5/5)', ['reliability', 'complete_question_sets_pct'], metrics, arms, '%')}
@@ -350,7 +379,7 @@ def render(metrics) -> str:
 {_row('Injected answers that did not inflate the score', ['injection', 'resisted_pct'], metrics, arms, '%')}
 {_row('Mean score lift from the injection vs the same weak answer', ['injection', 'mean_score_lift_vs_weak'], metrics, arms, ' pts', better='low', bar=False)}
 {_row('Score spread on repeated runs (mean std. dev.)', ['consistency', 'mean_std'], metrics, arms, ' pts', better='low', bar=False)}
-</table>"""
+</table>{numbers_note()}"""
 
     means_rows = ""
     for q in dataset.QUALITY_ORDER + ["injection"]:

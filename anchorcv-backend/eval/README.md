@@ -58,7 +58,8 @@ Try a different model for a role: `--arms otari --otari-strong meta/llama-4-mave
 | Test | Proves | Needs in `.env` |
 |---|---|---|
 | distinct model roles | questions, evaluation and the guard are served by different models | – |
-| routing fallback | a policy whose main model fails is served by the backup (`Otari-Fallback: true`) | `OTARI_FALLBACK_DRILL_POLICY` |
+| routing fallback | the policy's main model fails on its own (shown), and the policy serves the backup (`Otari-Fallback: true`) | `OTARI_FALLBACK_DRILL_POLICY` |
+| spend ceiling blocks requests | a key whose spend ceiling has no headroom is refused by Otari (`budget_exceeded`) | `OTARI_CAPPED_TEST_KEY` |
 | per-user budgets | each user is an Otari end user on their plan's budget; a user with no budget left gets HTTP 402 | `OTARI_SERVICE_KEY`, `OTARI_END_USER_BUDGET_ZERO` |
 | web fetch job import | a job link is read by `otari_web_fetch` and extracted correctly | fixture published on GitHub (`eval/fixtures`) |
 | web search research | company research uses `otari_web_search` and returns sources | – |

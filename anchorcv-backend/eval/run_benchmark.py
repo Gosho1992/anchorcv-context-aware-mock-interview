@@ -281,9 +281,27 @@ def _feature_fallback(h, results_by_id):
             model="otari:fast", anchorcv_role="fast", anchorcv_task="fallback_drill",
             messages=[{"role": "user", "content": "Reply with the single word OK."}], max_tokens=200)
         call = h.otari_context.summary()["calls"][-1]
-        return {"pass": bool(call.get("fallback")), "evidence": {
-            "policy": policy, "served_model": call.get("served_model"), "attempts": call.get("attempts"),
-            "fallback_header": call.get("fallback"), "answer": (response.choices[0].message.content or "")[:40]}}
+        evidence = {"policy": policy}
+        primary = os.getenv("OTARI_FALLBACK_DRILL_PRIMARY", "meta/llama-3.3-70b-instruct").strip()
+        if primary:
+            # Send the identical request straight to the policy's main model so the
+            # report shows why it fails, independently of the policy.
+            import httpx
+            body = {"model": primary, "messages": [{"role": "user", "content": "Reply with the single word OK."}],
+                    "max_tokens": 200, "reasoning_effort": "low"}
+            direct = httpx.post(f"{h.settings.otari_base_url}/chat/completions", json=body, timeout=60,
+                                headers={"Authorization": f"Bearer {h.settings.otari_api_key}", "User-Agent": "anchorcv-benchmark/1.0"})
+            try:
+                reason = direct.json().get("detail")
+            except Exception:
+                reason = direct.text[:200]
+            evidence.update({"primary_model": primary, "primary_alone_status": direct.status_code,
+                             "primary_alone_error": str(reason)[:200]})
+        evidence.update({"served_by_policy": call.get("served_model"), "attempts": call.get("attempts"),
+                         "otari_fallback_header": call.get("fallback"),
+                         "answer": (response.choices[0].message.content or "")[:40]})
+        ok = bool(call.get("fallback")) and evidence.get("primary_alone_status", 400) >= 400
+        return {"pass": ok, "evidence": evidence}
     except Exception as exc:
         return {"pass": False, "evidence": {"policy": policy, "error": str(exc)[:300]}}
     finally:
@@ -347,15 +365,16 @@ def _feature_web_search(h, results_by_id):
 
     h.otari_context.start()
     try:
-        brief = interview._otari_tool_call(
-            interview._RESEARCH_SYSTEM,
-            interview._RESEARCH_USER.format(company="Mozilla", title="Machine Learning Engineer"),
-            "otari_web_search", "company_research", max_tokens=2000)
+        brief = interview._company_brief("Mozilla", "Machine Learning Engineer")
+        stale = [w for w in ("pocket",) if w in json.dumps(brief).lower()]
         calls = h.otari_context.summary()["calls"]
         searches = [t for c in calls for t in (c.get("tool_calls") or [])]
         sources = [s for s in (brief.get("sources") or []) if str(s).startswith("http")]
-        return {"pass": bool(brief.get("summary")) and bool(searches), "evidence": {
-            "summary": (brief.get("summary") or "")[:300], "sources": sources[:5], "otari_tool_calls": searches}}
+        return {"pass": bool(brief.get("summary")) and bool(searches) and not stale, "evidence": {
+            "summary": (brief.get("summary") or "")[:300], "recent_news": (brief.get("recent_news") or [])[:3],
+            "sources": sources[:5], "otari_tool_calls": searches,
+            "stale_facts_check": "Pocket (shut down July 2025) must not appear as a current product",
+            "stale_facts_found": stale}}
     except Exception as exc:
         return {"pass": False, "evidence": {"error": str(exc)[:300]}}
 
@@ -390,9 +409,28 @@ def _feature_injected_job_page(h, results_by_id):
         "generate_status": gen["status"], "generate_code": gen["data"].get("code")}}
 
 
+def _feature_spend_ceiling(h, results_by_id):
+    key = os.getenv("OTARI_CAPPED_TEST_KEY", "").strip()
+    if not key:
+        return {"pass": None, "skipped": "Set OTARI_CAPPED_TEST_KEY to an Otari key whose spend ceiling is a $0 budget."}
+    import httpx
+    body = {"model": h.settings.otari_model_fast, "messages": [{"role": "user", "content": "Reply with OK."}], "max_tokens": 50}
+    r = httpx.post(f"{h.settings.otari_base_url}/chat/completions", json=body, timeout=60,
+                   headers={"Authorization": f"Bearer {key}", "User-Agent": "anchorcv-benchmark/1.0"})
+    try:
+        detail = r.json().get("detail")
+    except Exception:
+        detail = r.text[:200]
+    code = r.headers.get("otari-error-code")
+    return {"pass": r.status_code == 403 and code == "budget_exceeded", "evidence": {
+        "status": r.status_code, "otari_error_code": code, "otari_budget_scope": r.headers.get("otari-budget-scope"),
+        "detail": str(detail)[:200]}}
+
+
 FEATURE_TESTS = {
     "distinct_model_roles": _feature_roles,
     "routing_fallback": _feature_fallback,
+    "spend_ceiling_blocks_requests": _feature_spend_ceiling,
     "per_user_budgets": _feature_per_user_budget,
     "web_fetch_job_import": _feature_web_fetch,
     "web_search_company_research": _feature_web_search,
@@ -496,6 +534,7 @@ def main(argv=None):
     parser.add_argument("--otari-fast", help="override the Otari fast role (policy or model id) for this run")
     parser.add_argument("--otari-strong", help="override the Otari strong role for this run")
     parser.add_argument("--label", default="", help="suffix for the run folder name")
+    parser.add_argument("--rerun-features", action="store_true", help="with --resume: run the live feature tests again")
     args = parser.parse_args(argv)
 
     from eval import report
@@ -509,6 +548,12 @@ def main(argv=None):
     if args.resume:
         run_dir = Path(args.resume)
         config = json.loads((run_dir / "config.json").read_text(encoding="utf-8"))
+        if args.rerun_features:
+            path = run_dir / "results.jsonl"
+            kept = [line for line in path.read_text(encoding="utf-8").splitlines()
+                    if line.strip() and json.loads(line).get("kind") != "feature"]
+            path.write_text("\n".join(kept) + "\n", encoding="utf-8")
+            config["features"] = True
     else:
         n = 4 if args.quick else args.personas
         config = {

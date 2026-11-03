@@ -72,6 +72,13 @@ POST /chat/completions  (service key)  Otari-End-User-Budget: anchorcv-trial   "
 ```
 The id (`5ad5bc61-…`) only appears in `GET /end-user-budgets` or in the response header of a request that named no budget. AnchorCV now resolves names to ids itself. **Ask:** accept the budget name in the header, or show the id in the dashboard next to the name.
 
+### F11. Direct search isn't available on hosted Otari; tool-loop search has no freshness control
+```
+POST /search {"query":"Mozilla news 2026"}
+→ 400 "No search tools are configured. Add one on the dashboard's Tools & Guardrails page (or POST /api/v1/search-tools)..."
+```
+`otari_web_search` inside a completion works, but the model mixes in stale pages (a 2024 report describing a product shut down in 2025) and facts from memory. What made it reliable: reading the real `sources[].published_date` from `otari_tool_calls`, dropping sources older than 12 months in code, then letting a second model write only from what's left. **Ask:** a `max_age_days` / `published_after` option on `otari_web_search`, and enable direct search on hosted Otari.
+
 ## Draft answers to the written feedback questions (edit in your own words)
 
 **When were you most tempted to skip Otari and call the provider directly? What happened?**

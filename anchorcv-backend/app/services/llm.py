@@ -662,7 +662,13 @@ def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
         "completion_tokens": getattr(usage, "completion_tokens", None),
         "cost_usd": _cost_from_usage(usage),
         "tool_calls": [
-            {"type": c.get("type"), "status": c.get("status"), "url": c.get("url"), "query": c.get("query")}
+            {
+                "type": c.get("type"), "status": c.get("status"), "url": c.get("url"), "query": c.get("query"),
+                "sources": [
+                    {"url": src.get("url"), "title": src.get("title"), "published_date": src.get("published_date")}
+                    for src in (c.get("sources") or [])[:20] if isinstance(src, dict)
+                ],
+            }
             for c in tool_calls if isinstance(c, dict)
         ],
         "latency_ms": round((time.perf_counter() - started) * 1000),
