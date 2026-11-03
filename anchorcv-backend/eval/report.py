@@ -318,13 +318,21 @@ def render(metrics) -> str:
         except Exception:
             return None
 
+    def cost_note():
+        r = cost_ratio()
+        if r is None:
+            return "—"
+        if r >= 1:
+            return f"{r}× cheaper"
+        return f"{round((1 / r - 1) * 100)}% more"
+
     j, g = metrics["judge"], metrics["guardrail"]
     cards = f"""
 <div class="grid">
  <div class="card"><div class="k">Question grounding (Otari vs native)</div><div class="v ot">{_fmt(ot.get('grounding', {}).get('grounded_pct'), '%')}</div><div class="vs">native {_fmt(na.get('grounding', {}).get('grounded_pct'), '%')} · share of questions that cite this candidate's real CV/JD details</div></div>
  <div class="card"><div class="k">Evaluator ranks answers correctly</div><div class="v ot">{_fmt(ot.get('calibration', {}).get('pairwise_accuracy_pct'), '%')}</div><div class="vs">native {_fmt(na.get('calibration', {}).get('pairwise_accuracy_pct'), '%')} · strong &gt; average &gt; weak &gt; off-topic</div></div>
  <div class="card"><div class="k">Blind judges: Otari wins or ties</div><div class="v ot">{_fmt(j.get('otari_win_or_tie_pct'), '%')}</div><div class="vs">{j.get('otari_wins', 0)} wins · {j.get('ties', 0)} ties · {j.get('native_wins', 0)} losses ({j.get('verdicts', 0)} verdicts)</div></div>
- <div class="card"><div class="k">Cost per mock interview</div><div class="v ot">${_fmt(ot.get('cost_usd', {}).get('per_interview_estimate'))}</div><div class="vs">native ${_fmt(na.get('cost_usd', {}).get('per_interview_estimate'))} · {_fmt(cost_ratio(), '×')} cheaper</div></div>
+ <div class="card"><div class="k">Cost per mock interview</div><div class="v ot">${_fmt(ot.get('cost_usd', {}).get('per_interview_estimate'))}</div><div class="vs">native ${_fmt(na.get('cost_usd', {}).get('per_interview_estimate'))} · {cost_note()}</div></div>
  <div class="card"><div class="k">Integrity guardrail catches injections</div><div class="v ot">{_fmt(g.get('detection_pct_with_classifier'), '%')}</div><div class="vs">false positives {_fmt(g.get('false_positive_pct_with_classifier'), '%')} · patterns alone {_fmt(g.get('detection_pct_patterns_only'), '%')}</div></div>
 </div>"""
 
