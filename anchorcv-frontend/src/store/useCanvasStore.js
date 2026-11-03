@@ -37,6 +37,8 @@ const initialState = {
   interviewQuestions: [],
   interviewAnswers: {},
   interviewReport: null,
+  interviewCompanyBrief: null,
+  interviewOtariCalls: [],
   contextEvidenceSessionId: "",
   contextEvidenceClaims: [],
   contextEvidenceQuestions: [],
@@ -142,6 +144,23 @@ const useCanvasStore = create(
       },
       setInterviewReport(report) {
         set({ interviewReport: report || null });
+      },
+      setInterviewCompanyBrief(brief) {
+        set({ interviewCompanyBrief: brief || null });
+      },
+      // Each interview API response carries what Otari reported (model that
+      // served it, fallback, cost, guardrail); collected for the report.
+      addInterviewOtariCalls(otari) {
+        const calls = Array.isArray(otari?.calls) ? otari.calls : [];
+        if (!calls.length) {
+          return;
+        }
+        set((state) => ({
+          interviewOtariCalls: [...state.interviewOtariCalls, ...calls].slice(-200),
+        }));
+      },
+      clearInterviewOtariCalls() {
+        set({ interviewOtariCalls: [] });
       },
       setContextEvidenceSession(session) {
         const questions = Array.isArray(session?.questions) ? session.questions : [];
@@ -249,6 +268,8 @@ const useCanvasStore = create(
         interviewQuestions: state.interviewQuestions,
         interviewAnswers: state.interviewAnswers,
         interviewReport: state.interviewReport,
+        interviewCompanyBrief: state.interviewCompanyBrief,
+        interviewOtariCalls: state.interviewOtariCalls,
         contextEvidenceSessionId: state.contextEvidenceSessionId,
         contextEvidenceClaims: state.contextEvidenceClaims,
         contextEvidenceQuestions: state.contextEvidenceQuestions,

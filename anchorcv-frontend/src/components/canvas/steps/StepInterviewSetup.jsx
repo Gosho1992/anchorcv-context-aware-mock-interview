@@ -1,9 +1,12 @@
 ﻿import { useMemo, useState } from "react";
 import ModelSelect from "../../ModelSelect";
+import { OtariTraceLine } from "../../OtariTrace";
 import StepWrapper from "../StepWrapper";
 import {
+  importJobFromUrl,
   postJson,
   startContextEvidenceSession,
+  startInterviewSession,
 } from "../../../api/client";
 import useCanvasStore from "../../../store/useCanvasStore";
 import { trackCanvasEvent } from "../../../utils/canvasAnalytics";
@@ -686,6 +689,23 @@ function normalizeLegacyQuestion(rawQuestion, index, style) {
   };
 }
 
+function buildCompanyBriefText(brief) {
+  if (!brief) {
+    return "";
+  }
+  const parts = [];
+  if (brief.summary) {
+    parts.push(brief.summary);
+  }
+  if (brief.recent_news?.length) {
+    parts.push(`Recent developments: ${brief.recent_news.join(" | ")}`);
+  }
+  if (brief.interview_angles?.length) {
+    parts.push(`Likely interview angles: ${brief.interview_angles.join(" | ")}`);
+  }
+  return parts.join("\n").slice(0, 5000);
+}
+
 export default function StepInterviewSetup({ onComplete, onBack }) {
   const cvText = useCanvasStore((state) => state.cvText);
   const jdText = useCanvasStore((state) => state.jdText);
@@ -697,6 +717,16 @@ export default function StepInterviewSetup({ onComplete, onBack }) {
   const setContextEvidenceSession = useCanvasStore((state) => state.setContextEvidenceSession);
   const clearContextEvidence = useCanvasStore((state) => state.clearContextEvidence);
   const generatedResults = useCanvasStore((state) => state.generatedResults);
+  const companyBrief = useCanvasStore((state) => state.interviewCompanyBrief);
+  const setCompanyBrief = useCanvasStore((state) => state.setInterviewCompanyBrief);
+  const addInterviewOtariCalls = useCanvasStore((state) => state.addInterviewOtariCalls);
+  const clearInterviewOtariCalls = useCanvasStore((state) => state.clearInterviewOtariCalls);
+
+  const [jobUrl, setJobUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState("");
+  const [importedJob, setImportedJob] = useState(null);
+  const [importOtari, setImportOtari] = useState(null);
 
   const [targetRole, setTargetRole] = useState("");
   const [style, setStyle] = useState("mixed");
@@ -743,6 +773,32 @@ export default function StepInterviewSetup({ onComplete, onBack }) {
     [timeLimitChoice]
   );
 
+  async function handleImportJob() {
+    const url = jobUrl.trim();
+    setImportError("");
+    if (!/^https?:\/\/\S+\.\S+/i.test(url)) {
+      setImportError("Paste the full job link, starting with https://");
+      return;
+    }
+    setImporting(true);
+    try {
+      const result = await importJobFromUrl(url, true);
+      const job = result?.job || {};
+      setJD(job.job_description || "");
+      if (job.title && !targetRole.trim()) {
+        setTargetRole(job.title);
+      }
+      setImportedJob(job);
+      setCompanyBrief(result?.company_brief || null);
+      setImportOtari(result?.otari || null);
+      trackCanvasEvent("interview_job_imported", { has_company_brief: Boolean(result?.company_brief) });
+    } catch (err) {
+      setImportError(err?.message || "Could not import that job link. Paste the job description instead.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
   function toggleFocusArea(area) {
     setFocusAreas((current) =>
       current.includes(area) ? current.filter((item) => item !== area) : [...current, area]
@@ -770,8 +826,10 @@ export default function StepInterviewSetup({ onComplete, onBack }) {
         style: styleValue,
         difficulty: backendDifficulty,
         num_questions: requestCount,
+        company_brief: buildCompanyBriefText(companyBrief),
         model: selectedModel || "",
       });
+      addInterviewOtariCalls(fallback?.otari);
 
       const normalized = (fallback?.questions || [])
         .map((question, index) => normalizeLegacyQuestion(question, index + attempts * 100, styleValue))
@@ -808,6 +866,9 @@ export default function StepInterviewSetup({ onComplete, onBack }) {
 
     setLoading(true);
     setLoadingMessage("Planning interview strategy...");
+    startInterviewSession();
+    clearInterviewOtariCalls();
+    addInterviewOtariCalls(importOtari);
 
     const contextualRequirement = buildInterviewContextText({
       jdText,
@@ -1014,6 +1075,77 @@ export default function StepInterviewSetup({ onComplete, onBack }) {
             placeholder="Paste your target job description to personalize interview context..."
           />
         </label>
+
+        <div className="stack tight">
+          <span className="eyebrow">Or import from a job link</span>
+          <div className="button-row" style={{ justifyContent: "flex-start", flexWrap: "wrap", alignItems: "stretch" }}>
+            <input
+              className="input-modern"
+              style={{ flex: "1 1 320px" }}
+              value={jobUrl}
+              onChange={(event) => setJobUrl(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  handleImportJob();
+                }
+              }}
+              placeholder="https://careers.company.com/jobs/data-analyst"
+              disabled={importing || loading}
+              aria-label="Job posting link"
+            />
+            <button
+              type="button"
+              className="secondary-button compact-button"
+              onClick={handleImportJob}
+              disabled={importing || loading || !jobUrl.trim()}
+            >
+              {importing ? "Reading the page and researching the company..." : "Import job + research company"}
+            </button>
+          </div>
+          {importError ? (
+            <p className="muted-copy" style={{ margin: 0, color: "rgb(245,158,11)" }}>{importError}</p>
+          ) : null}
+        </div>
+
+        {importedJob ? (
+          <div className="analysis-meta-card teal">
+            <p className="eyebrow" style={{ marginBottom: "0.35rem" }}>Imported job</p>
+            <p style={{ margin: "0 0 0.35rem", fontWeight: 700 }}>
+              {[importedJob.title, importedJob.company, importedJob.location].filter(Boolean).join(" · ") || "Job posting"}
+            </p>
+            {companyBrief ? (
+              <div className="stack tight">
+                <p className="muted-copy" style={{ margin: 0 }}><strong>About the company:</strong> {companyBrief.summary}</p>
+                {companyBrief.recent_news?.length ? (
+                  <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+                    {companyBrief.recent_news.map((item) => (
+                      <li key={item} className="muted-copy">{item}</li>
+                    ))}
+                  </ul>
+                ) : null}
+                {companyBrief.interview_angles?.length ? (
+                  <p className="muted-copy" style={{ margin: 0 }}>
+                    <strong>Questions will probe:</strong> {companyBrief.interview_angles.join("; ")}
+                  </p>
+                ) : null}
+                {companyBrief.sources?.length ? (
+                  <p className="subtle-copy" style={{ margin: 0 }}>
+                    Sources:{" "}
+                    {companyBrief.sources.map((src, i) => (
+                      <a key={src} href={src} target="_blank" rel="noreferrer" style={{ marginRight: "0.5rem" }}>
+                        [{i + 1}]
+                      </a>
+                    ))}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+            <div style={{ marginTop: "0.5rem" }}>
+              <OtariTraceLine otari={importOtari} />
+            </div>
+          </div>
+        ) : null}
 
         <div className="stack tight">
           <span className="eyebrow">Interview Style</span>

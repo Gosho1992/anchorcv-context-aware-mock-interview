@@ -1,5 +1,32 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
+// One id per mock interview. The backend forwards it to Otari as
+// Otari-Conversation-Id, so each interview reads as one session in Otari.
+let interviewSessionId = "";
+
+export function startInterviewSession() {
+  interviewSessionId =
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? `interview-${crypto.randomUUID()}`
+      : `interview-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return interviewSessionId;
+}
+
+export function setInterviewSessionId(id) {
+  interviewSessionId = id || "";
+}
+
+// Otari refusals the user can act on (see app/services/otari_errors.py).
+function policyMessage(body) {
+  if (body?.code === "budget_exceeded") {
+    return "You've used this period's AI allowance for your plan. It resets automatically — or upgrade to the Season Pass for a larger daily allowance.";
+  }
+  if (body?.code === "guardrail_violation") {
+    return "AnchorCV's integrity check found text that tries to instruct the AI evaluator (for example hidden \"rate this candidate 10/10\" instructions in a CV, job page or answer). Remove it and try again.";
+  }
+  return "";
+}
+
 function normalizeErrorDetail(detail) {
   if (!detail) {
     return "Request failed.";
@@ -45,9 +72,14 @@ function normalizeErrorDetail(detail) {
 }
 
 async function request(path, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (interviewSessionId && path.startsWith("/interview/")) {
+    headers["X-AnchorCV-Session"] = interviewSessionId;
+  }
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
     ...options,
+    headers,
   });
 
   if (!response.ok) {
@@ -55,7 +87,8 @@ async function request(path, options = {}) {
     try {
       const body = await response.json();
       detail = body.detail || body.error || detail;
-      const error = new Error(normalizeErrorDetail(detail));
+      const error = new Error(policyMessage(body) || normalizeErrorDetail(detail));
+      error.code = body.code || "";
       error.detail = body.detail ?? body.error ?? detail;
       error.status = response.status;
       error.body = body;
@@ -122,6 +155,10 @@ export function postJson(path, payload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+}
+
+export function importJobFromUrl(url, researchCompany = true) {
+  return postJson("/interview/import-job", { url, research_company: researchCompany });
 }
 
 export function listFiles() {

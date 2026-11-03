@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import StepWrapper from "../StepWrapper";
+import { OtariTraceLine } from "../../OtariTrace";
 import { postJson, postMultipart, submitContextEvidenceAnswer } from "../../../api/client";
 import useCanvasStore from "../../../store/useCanvasStore";
 import { trackCanvasEvent } from "../../../utils/canvasAnalytics";
@@ -178,6 +179,7 @@ export default function StepInterviewSession({ onComplete, onBack }) {
   const answers = useCanvasStore((state) => state.interviewAnswers);
   const config = useCanvasStore((state) => state.interviewConfig);
   const selectedModel = useCanvasStore((state) => state.selectedModel);
+  const addInterviewOtariCalls = useCanvasStore((state) => state.addInterviewOtariCalls);
   const contextEvidenceSessionId = useCanvasStore((state) => state.contextEvidenceSessionId);
   const contextEvidenceEvaluations = useCanvasStore((state) => state.contextEvidenceEvaluations);
 
@@ -430,6 +432,7 @@ export default function StepInterviewSession({ onComplete, onBack }) {
       });
 
       setEvaluation(result);
+      addInterviewOtariCalls(result?.otari);
 
       let contextEvidenceResult = null;
       if (contextEvidenceSessionId && question.context_evidence_question_id) {
@@ -487,6 +490,7 @@ export default function StepInterviewSession({ onComplete, onBack }) {
             model: selectedModel || "",
           });
           setTeaching(lesson);
+          addInterviewOtariCalls(lesson?.otari);
         } catch {
           // Coaching is an enhancement and should not block scoring feedback.
         } finally {
@@ -818,6 +822,8 @@ export default function StepInterviewSession({ onComplete, onBack }) {
                 ) : null}
               </div>
             ) : null}
+
+            <OtariTraceLine otari={evaluation.otari} />
 
             {teachLoading ? (
               <p className="muted-copy" style={{ margin: 0 }}>

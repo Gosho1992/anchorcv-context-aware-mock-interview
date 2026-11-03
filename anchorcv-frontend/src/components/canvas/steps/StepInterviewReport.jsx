@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import StepWrapper from "../StepWrapper";
+import { OtariTraceSummary } from "../../OtariTrace";
 import {
   getInterviewEvidenceMatrix,
   getInterviewEvidenceRewrites,
@@ -528,6 +529,8 @@ export default function StepInterviewReport({ onBack, onRestart }) {
   const rewrites = useCanvasStore((state) => state.interviewEvidenceRewrites);
 
   const setInterviewReport = useCanvasStore((state) => state.setInterviewReport);
+  const interviewOtariCalls = useCanvasStore((state) => state.interviewOtariCalls);
+  const addInterviewOtariCalls = useCanvasStore((state) => state.addInterviewOtariCalls);
   const setInterviewQuestions = useCanvasStore((state) => state.setInterviewQuestions);
   const setInterviewEvidence = useCanvasStore((state) => state.setInterviewEvidence);
   const setInterviewEvidenceRewrites = useCanvasStore((state) => state.setInterviewEvidenceRewrites);
@@ -649,6 +652,7 @@ export default function StepInterviewReport({ onBack, onRestart }) {
         });
 
         setInterviewReport(result);
+        addInterviewOtariCalls(result?.otari);
       } catch (err) {
         const message = err?.message || "Report generation failed.";
         setError(message);
@@ -905,6 +909,8 @@ export default function StepInterviewReport({ onBack, onRestart }) {
             {benchmarkText ? (
               <p className="subtle-copy" style={{ margin: 0 }}><strong>Benchmark:</strong> {benchmarkText}</p>
             ) : null}
+
+            <OtariTraceSummary calls={interviewOtariCalls} />
 
             {contextEvidenceEnabled ? (
               <div className="stack">
