@@ -64,6 +64,14 @@ AnchorCV's voice answers use Whisper. `/models` lists no transcription model, so
 ### F9. `user` field on a normal key
 `"user": "<our end user id>"` on a normal key → `403 'user' field does not match the authenticated API key's user`. Correct per docs, but the fix (a service key, which only an org owner/admin can create in the dashboard) isn't mentioned in the error.
 
+### F10. `Otari-End-User-Budget` needs a budget id the dashboard never shows
+Budgets created in the dashboard show only their name. Sending the name fails:
+```
+POST /chat/completions  (service key)  Otari-End-User-Budget: anchorcv-trial   "user": "anchorcv:probe-1"
+→ 403 {"detail":"This key may not assign budget 'anchorcv-trial' to its end users","code":"end_user_budget_not_allowed"}
+```
+The id (`5ad5bc61-…`) only appears in `GET /end-user-budgets` or in the response header of a request that named no budget. AnchorCV now resolves names to ids itself. **Ask:** accept the budget name in the header, or show the id in the dashboard next to the name.
+
 ## Draft answers to the written feedback questions (edit in your own words)
 
 **When were you most tempted to skip Otari and call the provider directly? What happened?**
