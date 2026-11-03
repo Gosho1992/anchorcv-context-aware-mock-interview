@@ -480,6 +480,7 @@ def _sync_end_user_budget(end_user_id: str, wanted: str, current: str | None) ->
 
 
 _OPTIONAL_PARAMS = ("reasoning_effort", "response_format")
+_TRANSIENT_STATUS = {500, 502, 503, 504}
 
 
 def _is_unsupported_param_error(exc: "openai.APIStatusError") -> bool:
@@ -565,9 +566,25 @@ def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
     )
 
     started = time.perf_counter()
+
+    def _send():
+        # One retry for transient gateway/provider trouble (5xx, timeouts,
+        # dropped connections). Budget and guardrail refusals are 4xx and are
+        # never retried.
+        try:
+            return client.chat.completions.with_raw_response.create(**kwargs)
+        except openai.APIStatusError as exc:
+            if exc.status_code not in _TRANSIENT_STATUS:
+                raise
+            logger.warning("Otari %s for %s (%s); retrying once", exc.status_code, target, task)
+        except (openai.APITimeoutError, openai.APIConnectionError) as exc:
+            logger.warning("Otari %s for %s (%s); retrying once", type(exc).__name__, target, task)
+        entry["retried"] = True
+        return client.chat.completions.with_raw_response.create(**kwargs)
+
     try:
         try:
-            raw = client.chat.completions.with_raw_response.create(**kwargs)
+            raw = _send()
         except openai.APIStatusError as first:
             # Providers behind Otari differ in which optional parameters they
             # accept; a fallback model rejecting one fails the whole chain.
@@ -579,7 +596,7 @@ def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
                 k: v for k, v in kwargs["extra_body"].items() if k != "reasoning_effort"
             }
             kwargs.pop("response_format", None)
-            raw = client.chat.completions.with_raw_response.create(**kwargs)
+            raw = _send()
         completion = raw.parse()
         response_headers = raw.headers
     except openai.APIStatusError as exc:
@@ -615,7 +632,8 @@ def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
                 profile=settings.otari_guardrail_profile,
             ) from exc
         raise
-    except Exception:
+    except Exception as exc:
+        logger.warning("Otari call failed for %s (%s): %r", target, task, exc)
         entry.update({
             "ok": False,
             "status": None,

@@ -1,0 +1,31 @@
+{
+  "created": "2026-11-03T15:21:46",
+  "arms": [
+    "native",
+    "otari"
+  ],
+  "personas": [
+    "data-analyst-telecom",
+    "software-engineer-backend",
+    "mechanical-engineer-graduate",
+    "nurse-international",
+    "marketing-associate",
+    "finance-analyst",
+    "ux-designer",
+    "civil-engineer",
+    "phd-researcher-ml",
+    "supply-chain-analyst",
+    "teacher-to-edtech",
+    "cybersecurity-analyst"
+  ],
+  "repeats": 3,
+  "workers": 6,
+  "judges": [
+    "deepseek/deepseek-v4-pro",
+    "mistralai/mistral-large-latest",
+    "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "features": true,
+  "questions_per_persona": 5,
+  "otari_overrides": {}
+}

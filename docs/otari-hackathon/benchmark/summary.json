@@ -1,0 +1,541 @@
+{
+  "config": {
+    "created": "2026-11-03T15:21:46",
+    "arms": [
+      "native",
+      "otari"
+    ],
+    "personas": [
+      "data-analyst-telecom",
+      "software-engineer-backend",
+      "mechanical-engineer-graduate",
+      "nurse-international",
+      "marketing-associate",
+      "finance-analyst",
+      "ux-designer",
+      "civil-engineer",
+      "phd-researcher-ml",
+      "supply-chain-analyst",
+      "teacher-to-edtech",
+      "cybersecurity-analyst"
+    ],
+    "repeats": 3,
+    "workers": 6,
+    "judges": [
+      "deepseek/deepseek-v4-pro",
+      "mistralai/mistral-large-latest",
+      "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "features": true,
+    "questions_per_persona": 5,
+    "otari_overrides": {}
+  },
+  "arms": {
+    "native": {
+      "reliability": {
+        "question_requests": 12,
+        "question_success_pct": 100.0,
+        "complete_question_sets_pct": 100.0,
+        "evaluation_requests": 108,
+        "evaluation_success_pct": 100.0,
+        "errors": [],
+        "fallbacks": 0,
+        "compat_retries": 0
+      },
+      "grounding": {
+        "questions": 60,
+        "grounded_pct": 75.0,
+        "unsupported_number_pct": 0.0,
+        "per_persona": {
+          "data-analyst-telecom": {
+            "grounded": 4,
+            "total": 5
+          },
+          "software-engineer-backend": {
+            "grounded": 5,
+            "total": 5
+          },
+          "mechanical-engineer-graduate": {
+            "grounded": 2,
+            "total": 5
+          },
+          "nurse-international": {
+            "grounded": 5,
+            "total": 5
+          },
+          "marketing-associate": {
+            "grounded": 3,
+            "total": 5
+          },
+          "finance-analyst": {
+            "grounded": 5,
+            "total": 5
+          },
+          "ux-designer": {
+            "grounded": 5,
+            "total": 5
+          },
+          "civil-engineer": {
+            "grounded": 3,
+            "total": 5
+          },
+          "phd-researcher-ml": {
+            "grounded": 3,
+            "total": 5
+          },
+          "supply-chain-analyst": {
+            "grounded": 4,
+            "total": 5
+          },
+          "teacher-to-edtech": {
+            "grounded": 2,
+            "total": 5
+          },
+          "cybersecurity-analyst": {
+            "grounded": 4,
+            "total": 5
+          }
+        }
+      },
+      "calibration": {
+        "pairwise_accuracy_pct": 100.0,
+        "pairs": 72,
+        "band_accuracy_pct": 98.3,
+        "spearman": 0.989,
+        "mean_score_by_quality": {
+          "strong": 82.6,
+          "average": 61.2,
+          "weak": 44.2,
+          "off_topic": 25,
+          "injection": 45.1
+        },
+        "scores": {
+          "data-analyst-telecom": {
+            "strong": 83,
+            "average": 56,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "software-engineer-backend": {
+            "strong": 83,
+            "average": 56,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "mechanical-engineer-graduate": {
+            "strong": 83,
+            "average": 55,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "nurse-international": {
+            "strong": 83,
+            "average": 56,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "marketing-associate": {
+            "strong": 83,
+            "average": 56,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "finance-analyst": {
+            "strong": 78,
+            "average": 56,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 36
+          },
+          "ux-designer": {
+            "strong": 83,
+            "average": 72,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 55
+          },
+          "civil-engineer": {
+            "strong": 83,
+            "average": 64,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "phd-researcher-ml": {
+            "strong": 83,
+            "average": 56,
+            "weak": 36,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "supply-chain-analyst": {
+            "strong": 83,
+            "average": 64,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "teacher-to-edtech": {
+            "strong": 83,
+            "average": 72,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          },
+          "cybersecurity-analyst": {
+            "strong": 83,
+            "average": 72,
+            "weak": 45,
+            "off_topic": 25,
+            "injection": 45
+          }
+        }
+      },
+      "injection": {
+        "answers": 12,
+        "resisted_pct": 100.0,
+        "blocked_by_guardrail": 0,
+        "mean_score_lift_vs_weak": 0.8
+      },
+      "consistency": {
+        "groups": 24,
+        "mean_std": 0.79,
+        "max_spread": 16
+      },
+      "latency_s": {
+        "questions_p50": 7.02,
+        "questions_p95": 8.38,
+        "evaluation_p50": 3.9,
+        "evaluation_p95": 5.53
+      },
+      "cost_usd": {
+        "questions_mean": 0.00038,
+        "evaluation_mean": 0.000237,
+        "per_interview_estimate": 0.001564,
+        "per_1000_interviews": 1.56,
+        "basis": "tokens x OpenAI list price"
+      },
+      "served_models": {
+        "interview_evaluate -> gpt-4o-mini": 108,
+        "interview_questions -> gpt-4o-mini": 12
+      }
+    },
+    "otari": {
+      "reliability": {
+        "question_requests": 12,
+        "question_success_pct": 100.0,
+        "complete_question_sets_pct": 100.0,
+        "evaluation_requests": 108,
+        "evaluation_success_pct": 100.0,
+        "errors": [],
+        "fallbacks": 0,
+        "compat_retries": 0
+      },
+      "grounding": {
+        "questions": 60,
+        "grounded_pct": 86.7,
+        "unsupported_number_pct": 5.0,
+        "per_persona": {
+          "data-analyst-telecom": {
+            "grounded": 5,
+            "total": 5
+          },
+          "software-engineer-backend": {
+            "grounded": 4,
+            "total": 5
+          },
+          "mechanical-engineer-graduate": {
+            "grounded": 5,
+            "total": 5
+          },
+          "nurse-international": {
+            "grounded": 4,
+            "total": 5
+          },
+          "marketing-associate": {
+            "grounded": 5,
+            "total": 5
+          },
+          "finance-analyst": {
+            "grounded": 5,
+            "total": 5
+          },
+          "ux-designer": {
+            "grounded": 5,
+            "total": 5
+          },
+          "civil-engineer": {
+            "grounded": 4,
+            "total": 5
+          },
+          "phd-researcher-ml": {
+            "grounded": 3,
+            "total": 5
+          },
+          "supply-chain-analyst": {
+            "grounded": 5,
+            "total": 5
+          },
+          "teacher-to-edtech": {
+            "grounded": 2,
+            "total": 5
+          },
+          "cybersecurity-analyst": {
+            "grounded": 5,
+            "total": 5
+          }
+        }
+      },
+      "calibration": {
+        "pairwise_accuracy_pct": 100.0,
+        "pairs": 72,
+        "band_accuracy_pct": 100.0,
+        "spearman": 0.968,
+        "mean_score_by_quality": {
+          "strong": 85.3,
+          "average": 62.7,
+          "weak": 40.7,
+          "off_topic": 17.9,
+          "injection": 40
+        },
+        "scores": {
+          "data-analyst-telecom": {
+            "strong": 88,
+            "average": 62,
+            "weak": 42,
+            "off_topic": 22
+          },
+          "software-engineer-backend": {
+            "strong": 85,
+            "average": 62,
+            "weak": 40,
+            "off_topic": 13
+          },
+          "mechanical-engineer-graduate": {
+            "strong": 80,
+            "average": 45,
+            "weak": 42,
+            "off_topic": 23
+          },
+          "nurse-international": {
+            "strong": 85,
+            "average": 68,
+            "weak": 42,
+            "off_topic": 22,
+            "injection": 35
+          },
+          "marketing-associate": {
+            "strong": 85,
+            "average": 45,
+            "weak": 32,
+            "off_topic": 13
+          },
+          "finance-analyst": {
+            "strong": 85,
+            "average": 62,
+            "weak": 45,
+            "off_topic": 13
+          },
+          "ux-designer": {
+            "strong": 85,
+            "average": 68,
+            "weak": 45,
+            "off_topic": 13
+          },
+          "civil-engineer": {
+            "strong": 85,
+            "average": 70,
+            "weak": 45,
+            "off_topic": 18,
+            "injection": 45
+          },
+          "phd-researcher-ml": {
+            "strong": 85,
+            "average": 70,
+            "weak": 42,
+            "off_topic": 22
+          },
+          "supply-chain-analyst": {
+            "strong": 85,
+            "average": 62,
+            "weak": 36,
+            "off_topic": 13
+          },
+          "teacher-to-edtech": {
+            "strong": 88,
+            "average": 70,
+            "weak": 32,
+            "off_topic": 22
+          },
+          "cybersecurity-analyst": {
+            "strong": 88,
+            "average": 68,
+            "weak": 45,
+            "off_topic": 21
+          }
+        }
+      },
+      "injection": {
+        "answers": 12,
+        "resisted_pct": 100.0,
+        "blocked_by_guardrail": 10,
+        "mean_score_lift_vs_weak": -3.5
+      },
+      "consistency": {
+        "groups": 24,
+        "mean_std": 0.52,
+        "max_spread": 7
+      },
+      "latency_s": {
+        "questions_p50": 9.02,
+        "questions_p95": 12.83,
+        "evaluation_p50": 3.0,
+        "evaluation_p95": 5.85
+      },
+      "cost_usd": {
+        "questions_mean": 0.000107,
+        "evaluation_mean": 0.000366,
+        "per_interview_estimate": 0.001937,
+        "per_1000_interviews": 1.94,
+        "basis": "Otari usage.cost_usd"
+      },
+      "served_models": {
+        "interview_evaluate -> us.meta.llama4-maverick-17b-instruct-v1:0": 98,
+        "interview_questions -> openai/gpt-oss-20b": 12
+      }
+    }
+  },
+  "guardrail": {
+    "injections": 16,
+    "clean": 40,
+    "detection_pct_patterns_only": 56.2,
+    "detection_pct_with_classifier": 100.0,
+    "false_positive_pct_patterns_only": 0.0,
+    "false_positive_pct_with_classifier": 0.0,
+    "inconclusive": 0,
+    "cost_per_check_usd": 0.00013,
+    "latency_p50_s": 1.64,
+    "missed": [],
+    "false_positives": []
+  },
+  "judge": {
+    "verdicts": 72,
+    "otari_wins": 67,
+    "native_wins": 5,
+    "ties": 0,
+    "otari_win_or_tie_pct": 93.1,
+    "mean_score_native": 6.42,
+    "mean_score_otari": 8.81,
+    "judges": [
+      "deepseek/deepseek-v4-pro",
+      "mistralai/mistral-large-latest",
+      "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "errors": []
+  },
+  "features": {
+    "distinct_model_roles": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "question_generation": [
+          "openai/gpt-oss-20b"
+        ],
+        "answer_evaluation": [
+          "us.meta.llama4-maverick-17b-instruct-v1:0"
+        ],
+        "integrity_guard": [
+          "openai.gpt-oss-safeguard-120b"
+        ]
+      }
+    },
+    "routing_fallback": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "policy": "anchorcv-failover-drill",
+        "served_model": "openai/gpt-oss-20b",
+        "attempts": 2,
+        "fallback_header": true,
+        "answer": "OK"
+      }
+    },
+    "per_user_budgets": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "trial_user_status": 200,
+        "trial_user_budget": "5ad5bc61-33f6-40ac-972a-9424209b455b",
+        "expected_trial_budget_id": "5ad5bc61-33f6-40ac-972a-9424209b455b",
+        "exhausted_user_status": 402,
+        "exhausted_user_code": "budget_exceeded"
+      }
+    },
+    "web_fetch_job_import": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "url": "https://raw.githubusercontent.com/Gosho1992/anchorcv-context-aware-mock-interview/otari-hackathon/anchorcv-backend/eval/fixtures/sample_job.html",
+        "status": 200,
+        "title": "Junior Data Analyst",
+        "company": "Lumen Field Labs",
+        "jd_chars": 588,
+        "otari_tool_calls": [
+          {
+            "type": "web_fetch",
+            "status": "completed",
+            "url": "https://raw.githubusercontent.com/Gosho1992/anchorcv-context-aware-mock-interview/otari-hackathon/anchorcv-backend/eval/fixtures/sample_job.html",
+            "query": null
+          }
+        ],
+        "error": null
+      }
+    },
+    "web_search_company_research": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "summary": "Mozilla Corporation is a non‑profit‑backed technology company headquartered in San Francisco that builds open‑source software for the web, most famously the Firefox browser and the Pocket content‑curation service. With over 225 million monthly users worldwide, Mozilla operates at a global scale, emp",
+        "sources": [
+          "https://www.mozilla.org/en-US/careers/listings",
+          "https://blog.mozilla.org/2024/05/01/firefox-ai-assistant-launch/",
+          "https://blog.mozilla.org/2024/04/15/firefox-122-release/",
+          "https://blog.mozilla.org/2024/03/10/open-source-privacy-ai-tools/"
+        ],
+        "otari_tool_calls": [
+          {
+            "type": "web_search",
+            "status": "completed",
+            "url": null,
+            "query": "Mozilla Machine Learning Engineer hiring recent news"
+          }
+        ]
+      }
+    },
+    "guardrail_blocks_injected_cv": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "clean_status": 200,
+        "clean_guardrail_header": "[{\"profile\":\"anchorcv-integrity\",\"mode\":\"block\",\"valid\":true,\"score\":0.0,\"status\":\"evaluated\"}]",
+        "injected_status": 422,
+        "injected_code": "guardrail_violation"
+      }
+    },
+    "guardrail_injected_job_page": {
+      "pass": true,
+      "skipped": null,
+      "evidence": {
+        "import_status": 200,
+        "instruction_survived_extraction": false,
+        "generate_status": 200,
+        "generate_code": null
+      }
+    }
+  }
+}

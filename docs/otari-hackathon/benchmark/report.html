@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnchorCV × Otari benchmark</title><style>
+:root{--bg:#0f1115;--card:#171a21;--ink:#e8eaf0;--muted:#9aa3b2;--line:#2a2f3a;--a:#7c8cf8;--b:#2dd4bf;--warn:#f59e0b;--bad:#ef4444;--good:#22c55e}
+@media (prefers-color-scheme: light){:root{--bg:#f7f7f9;--card:#fff;--ink:#14161c;--muted:#5b6474;--line:#e3e6ec}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1060px;margin:0 auto;padding:32px 20px 60px}h1{font-size:28px;margin:0 0 4px}h2{font-size:19px;margin:34px 0 10px}
+.sub{color:var(--muted);margin:0 0 18px}.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}.v{font-size:26px;font-weight:700;margin-top:2px}
+.vs{font-size:13px;color:var(--muted)}table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:600}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;min-width:120px}.bar>span{display:block;height:100%}
+.na{color:var(--a)}.ot{color:var(--b)}.pass{color:var(--good);font-weight:700}.fail{color:var(--bad);font-weight:700}.skip{color:var(--muted)}
+code{font-size:12.5px;background:var(--line);padding:1px 5px;border-radius:4px}details{margin-top:6px}.small{font-size:13px;color:var(--muted)}
+</style></head><body><main>
+<h1>AnchorCV × Mozilla.ai Otari — benchmark</h1>
+<p class="sub">Native GPT-4o-mini vs open-weight models through Otari, on AnchorCV's Context-Aware Mock Interview · run 2026-11-03T15:21:46</p>
+
+<div class="grid">
+ <div class="card"><div class="k">Question grounding (Otari vs native)</div><div class="v ot">86.7%</div><div class="vs">native 75.0% · share of questions that cite this candidate's real CV/JD details</div></div>
+ <div class="card"><div class="k">Evaluator ranks answers correctly</div><div class="v ot">100.0%</div><div class="vs">native 100.0% · strong &gt; average &gt; weak &gt; off-topic</div></div>
+ <div class="card"><div class="k">Blind judges: Otari wins or ties</div><div class="v ot">93.1%</div><div class="vs">67 wins · 0 ties · 5 losses (72 verdicts)</div></div>
+ <div class="card"><div class="k">Cost per mock interview</div><div class="v ot">$0.001937</div><div class="vs">native $0.001564 · 0.8× cheaper</div></div>
+ <div class="card"><div class="k">Integrity guardrail catches injections</div><div class="v ot">100.0%</div><div class="vs">false positives 0.0% · patterns alone 56.2%</div></div>
+</div>
+<h2>1 · Quality and reliability</h2>
+<table><tr><th>Metric</th><th class='na'>Native (GPT-4o-mini via OpenAI)</th><th class='ot'>Otari (open-weight models)</th></tr>
+<tr><td>Question requests that succeeded<div class='small'>higher is better</div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--a)"></span></div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Complete question sets (5/5)<div class='small'>higher is better</div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--a)"></span></div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Evaluation requests that succeeded<div class='small'>higher is better</div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--a)"></span></div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Questions grounded in the CV/JD<div class='small'>higher is better</div></td><td><b>75.0%</b><div class="bar"><span style="width:75.0%;background:var(--a)"></span></div></td><td><b>86.7%</b><div class="bar"><span style="width:86.7%;background:var(--b)"></span></div></td></tr>
+<tr><td>Questions citing a number not in the CV/JD<div class='small'>lower is better</div></td><td><b>0.0%</b><div class="bar"><span style="width:0.0%;background:var(--a)"></span></div></td><td><b>5.0%</b><div class="bar"><span style="width:5.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Evaluator pairwise ranking accuracy<div class='small'>higher is better</div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--a)"></span></div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Scores inside the expected band<div class='small'>higher is better</div></td><td><b>98.3%</b><div class="bar"><span style="width:98.3%;background:var(--a)"></span></div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Spearman: answer quality vs score<div class='small'>higher is better</div></td><td><b>0.989</b><div class="bar"><span style="width:98.9%;background:var(--a)"></span></div></td><td><b>0.968</b><div class="bar"><span style="width:96.8%;background:var(--b)"></span></div></td></tr>
+<tr><td>Injected answers that did not inflate the score<div class='small'>higher is better</div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--a)"></span></div></td><td><b>100.0%</b><div class="bar"><span style="width:100.0%;background:var(--b)"></span></div></td></tr>
+<tr><td>Mean score lift from the injection vs the same weak answer<div class='small'>lower is better</div></td><td><b>0.8 pts</b></td><td><b>-3.5 pts</b></td></tr>
+<tr><td>Score spread on repeated runs (mean std. dev.)<div class='small'>lower is better</div></td><td><b>0.79 pts</b></td><td><b>0.52 pts</b></td></tr>
+</table><h3 style="margin-top:18px">Mean evaluator score by planted answer quality</h3>
+<table><tr><th>Answer</th><th>Expected</th><th class='na'>Native (GPT-4o-mini via OpenAI)</th><th class='ot'>Otari (open-weight models)</th></tr><tr><td>strong</td><td class='small'>70–100</td><td>82.6</td><td>85.3</td></tr><tr><td>average</td><td class='small'>40–79</td><td>61.2</td><td>62.7</td></tr><tr><td>weak</td><td class='small'>0–54</td><td>44.2</td><td>40.7</td></tr><tr><td>off-topic</td><td class='small'>0–40</td><td>25</td><td>17.9</td></tr><tr><td>injection</td><td class='small'>0–54</td><td>45.1</td><td>40</td></tr></table>
+<h2>2 · Speed and cost</h2>
+<table><tr><th>Metric</th><th class='na'>Native (GPT-4o-mini via OpenAI)</th><th class='ot'>Otari (open-weight models)</th></tr>
+<tr><td>Question generation, median (s)<div class='small'>lower is better</div></td><td><b>7.02 s</b></td><td><b>9.02 s</b></td></tr>
+<tr><td>Question generation, p95 (s)<div class='small'>lower is better</div></td><td><b>8.38 s</b></td><td><b>12.83 s</b></td></tr>
+<tr><td>Answer evaluation, median (s)<div class='small'>lower is better</div></td><td><b>3.9 s</b></td><td><b>3.0 s</b></td></tr>
+<tr><td>Answer evaluation, p95 (s)<div class='small'>lower is better</div></td><td><b>5.53 s</b></td><td><b>5.85 s</b></td></tr>
+<tr><td>Cost per question set (USD)<div class='small'>lower is better</div></td><td><b>0.00038</b></td><td><b>0.000107</b></td></tr>
+<tr><td>Cost per answer evaluation (USD)<div class='small'>lower is better</div></td><td><b>0.000237</b></td><td><b>0.000366</b></td></tr>
+<tr><td>Cost per 1,000 mock interviews (USD)<div class='small'>lower is better</div></td><td><b>1.56</b></td><td><b>1.94</b></td></tr>
+</table>
+<p class="small">Native cost = tokens × OpenAI list price for gpt-4o-mini ($0.15 / $0.60 per 1M). Otari cost = <code>usage.cost_usd</code> reported by Otari per request. One interview = 1 question set + 5 evaluations.</p>
+<h2>3 · Blind comparison of question sets</h2>
+<p class="sub">For each candidate, independent open-weight judges (deepseek/deepseek-v4-pro, mistralai/mistral-large-latest, nvidia/nemotron-3-super-120b-a12b) compared the native and Otari question sets without knowing which was which, in both orders to cancel position bias.</p>
+<div class="grid"><div class="card"><div class="k">Otari wins</div><div class="v ot">67</div></div>
+<div class="card"><div class="k">Ties</div><div class="v">0</div></div>
+<div class="card"><div class="k">Native wins</div><div class="v na">5</div></div>
+<div class="card"><div class="k">Mean judge score (1–10)</div><div class="v">8.81 <span class="vs">Otari</span> / 6.42 <span class="vs">native</span></div></div></div>
+<h2>4 · Integrity guardrail (Otari guardrail → AnchorCV endpoint → gpt-oss-safeguard)</h2>
+<table><tr><th>Metric</th><th>Patterns only</th><th>Patterns + open-weight classifier</th></tr>
+<tr><td>Injections caught (16 hidden instructions in answers, CVs, job pages)</td><td>56.2%</td><td><b>100.0%</b></td></tr>
+<tr><td>Clean texts wrongly flagged (40 CVs, JDs, answers)</td><td>0.0%</td><td><b>0.0%</b></td></tr>
+<tr><td>Cost per check / median latency</td><td>$0 / ~0 s</td><td>$0.00013 / 1.64 s</td></tr></table>
+<p class="small">Missed: none · False positives: none</p>
+<h2>5 · Otari features exercised live</h2>
+<table><tr><th>Feature</th><th>Result</th><th>Evidence</th></tr><tr><td>distinct model roles</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;question_generation&quot;: [&quot;openai/gpt-oss-20b&quot;], &quot;answer_evaluation&quot;: [&quot;us.meta.llama4-maverick-17b-instruct-v1:0&quot;], &quot;integrity_guard&quot;: [&quot;openai.gpt-oss-safeguard-120b&quot;]}</td></tr><tr><td>routing fallback</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;policy&quot;: &quot;anchorcv-failover-drill&quot;, &quot;served_model&quot;: &quot;openai/gpt-oss-20b&quot;, &quot;attempts&quot;: 2, &quot;fallback_header&quot;: true, &quot;answer&quot;: &quot;OK&quot;}</td></tr><tr><td>per user budgets</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;trial_user_status&quot;: 200, &quot;trial_user_budget&quot;: &quot;5ad5bc61-33f6-40ac-972a-9424209b455b&quot;, &quot;expected_trial_budget_id&quot;: &quot;5ad5bc61-33f6-40ac-972a-9424209b455b&quot;, &quot;exhausted_user_status&quot;: 402, &quot;exhausted_user_code&quot;: &quot;budget_exceeded&quot;}</td></tr><tr><td>web fetch job import</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;url&quot;: &quot;https://raw.githubusercontent.com/Gosho1992/anchorcv-context-aware-mock-interview/otari-hackathon/anchorcv-backend/eval/fixtures/sample_job.html&quot;, &quot;status&quot;: 200, &quot;title&quot;: &quot;Junior Data Analyst&quot;, &quot;company&quot;: &quot;Lumen Field Labs&quot;, &quot;jd_chars&quot;: 588, &quot;otari_tool_calls&quot;: [{&quot;type&quot;: &quot;web_fetch&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;url&quot;: &quot;https://raw.githubusercontent.com/Gosho1992/anchorcv-context-aware-mock-interview/otari-hackathon/anchorcv-backend/eval/fixtures/sample_job.html&quot;, &quot;query&quot;: null}], &quot;error&quot;: null}</td></tr><tr><td>web search company research</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;summary&quot;: &quot;Mozilla Corporation is a non‑profit‑backed technology company headquartered in San Francisco that builds open‑source software for the web, most famously the Firefox browser and the Pocket content‑curation service. With over 225 million monthly users worldwide, Mozilla operates at a global scale, emp&quot;, &quot;sources&quot;: [&quot;https://www.mozilla.org/en-US/careers/listings&quot;, &quot;https://blog.mozilla.org/2024/05/01/firefox-ai-assistant-launch/&quot;, &quot;https://blog.mozilla.org/2024/04/15/firefox-122-release/&quot;, &quot;https://blog.mozilla.org/2024/03/10/open-source-privacy-ai-tools/&quot;], &quot;otari_tool_calls&quot;: [{&quot;type&quot;: &quot;web_search&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;url&quot;: null, &quot;query&quot;: &quot;Mozilla Machine Learning Engineer </td></tr><tr><td>guardrail blocks injected cv</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;clean_status&quot;: 200, &quot;clean_guardrail_header&quot;: &quot;[{\&quot;profile\&quot;:\&quot;anchorcv-integrity\&quot;,\&quot;mode\&quot;:\&quot;block\&quot;,\&quot;valid\&quot;:true,\&quot;score\&quot;:0.0,\&quot;status\&quot;:\&quot;evaluated\&quot;}]&quot;, &quot;injected_status&quot;: 422, &quot;injected_code&quot;: &quot;guardrail_violation&quot;}</td></tr><tr><td>guardrail injected job page</td><td><span class='pass'>PASS</span></td><td class='small'>{&quot;import_status&quot;: 200, &quot;instruction_survived_extraction&quot;: false, &quot;generate_status&quot;: 200, &quot;generate_code&quot;: null}</td></tr></table><details><summary><b>Which model served each step</b></summary>
+<table><tr><th>Arm</th><th>Task → model</th><th>Calls</th></tr><tr><td>Native (GPT-4o-mini via OpenAI)</td><td><code>interview_evaluate -&gt; gpt-4o-mini</code></td><td>108</td></tr><tr><td>Native (GPT-4o-mini via OpenAI)</td><td><code>interview_questions -&gt; gpt-4o-mini</code></td><td>12</td></tr><tr><td>Otari (open-weight models)</td><td><code>interview_evaluate -&gt; us.meta.llama4-maverick-17b-instruct-v1:0</code></td><td>98</td></tr><tr><td>Otari (open-weight models)</td><td><code>interview_questions -&gt; openai/gpt-oss-20b</code></td><td>12</td></tr></table></details>
+<h2>Method</h2>
+<p class="small">12 candidate personas (international-student and early-career profiles across data, software, engineering,
+nursing, marketing, finance, design, construction, research, supply chain, teaching and security). Each has a CV, a job description, a list of
+CV-specific anchor phrases, one interview question and five scripted answers of known quality (strong, average, weak, off-topic, and a weak
+answer carrying an injection). Both arms run AnchorCV's real <code>/api/interview/*</code> endpoints in-process with identical prompts; only the
+provider differs. Grounding = a question contains at least one anchor. Pairwise accuracy is over the 6 ordered pairs per persona
+(ties count ½). Strong and average answers were scored 3× to measure consistency. Raw calls are in <code>results.jsonl</code>.</p>
+</main></body></html>

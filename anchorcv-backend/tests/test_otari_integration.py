@@ -395,3 +395,31 @@ def test_budget_names_resolve_to_ids_once(monkeypatch):
     assert llm._end_user_budget_for("trial") == "5ad5bc61-33f6-40ac-972a-9424209b455b"
     assert len(lookups) == 1
     assert llm._resolve_budget_id("f9728fce-6b7f-4b81-9852-87b8b46a2686") == "f9728fce-6b7f-4b81-9852-87b8b46a2686"
+
+
+def test_transient_gateway_error_is_retried_once():
+    attempts = []
+
+    def reply(kwargs):
+        attempts.append(1)
+        if len(attempts) == 1:
+            return status_error(502, {}, "upstream timed out")(kwargs)
+        return ok_reply()(kwargs)
+
+    FakeOtari.reply = reply
+    call(model="gpt-4o-mini")
+    assert len(attempts) == 2
+    assert otari_context.summary()["calls"][-1]["retried"] is True
+
+
+def test_policy_refusals_are_not_retried():
+    attempts = []
+
+    def reply(kwargs):
+        attempts.append(1)
+        return status_error(403, {"otari-error-code": "budget_exceeded"}, "has exceeded budget limit")(kwargs)
+
+    FakeOtari.reply = reply
+    with pytest.raises(llm.OtariBudgetExceeded):
+        call(model="gpt-4o-mini")
+    assert len(attempts) == 1
