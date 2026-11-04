@@ -497,6 +497,17 @@ def _is_unsupported_param_error(exc: "openai.APIStatusError") -> bool:
     )
 
 
+def _is_guardrail_url_error(exc: "openai.APIStatusError") -> bool:
+    if exc.status_code != 400:
+        return False
+    try:
+        text = str(exc.response.json().get("detail", ""))
+    except Exception:
+        text = str(exc)
+    text = text.lower()
+    return any(hint in text for hint in ("could not be resolved", "guardrail", "must use https", "url must"))
+
+
 def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
     """Send an OpenAI-compatible chat completion request to Otari."""
     ctx = otari_context.ensure()
@@ -584,7 +595,20 @@ def _call_otari_sync(role: str, guardrail: bool, task: str | None, **kwargs):
 
     try:
         try:
-            raw = _send()
+            try:
+                raw = _send()
+            except openai.APIStatusError as guard_exc:
+                # Otari validates a request-level guardrail URL before anything
+                # runs; an endpoint that does not resolve fails the whole request
+                # (400), which `on_unavailable: monitor` does not cover. A dead
+                # guardrail endpoint must not stop interviews: run once without
+                # it and record that the check was skipped.
+                if not (kwargs["extra_body"].get("guardrails") and _is_guardrail_url_error(guard_exc)):
+                    raise
+                logger.warning("Otari rejected the guardrail endpoint; continuing without it (%s)", task)
+                entry["guardrail_skipped"] = "endpoint unreachable"
+                kwargs["extra_body"] = {k: v for k, v in kwargs["extra_body"].items() if k != "guardrails"}
+                raw = _send()
         except openai.APIStatusError as first:
             # Providers behind Otari differ in which optional parameters they
             # accept; a fallback model rejecting one fails the whole chain.

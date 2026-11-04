@@ -423,3 +423,24 @@ def test_policy_refusals_are_not_retried():
     with pytest.raises(llm.OtariBudgetExceeded):
         call(model="gpt-4o-mini")
     assert len(attempts) == 1
+
+
+def test_unreachable_guardrail_endpoint_does_not_block_the_request():
+    attempts = []
+
+    def reply(kwargs):
+        attempts.append(dict(kwargs["extra_body"]))
+        if len(attempts) == 1:
+            return status_error(400, {}, "MCP server host 'old-tunnel.trycloudflare.com' could not be resolved at validation time")(kwargs)
+        return ok_reply()(kwargs)
+
+    FakeOtari.reply = reply
+    call(model="gpt-4o-mini", anchorcv_guardrail=True)
+    assert "guardrails" in attempts[0] and "guardrails" not in attempts[1]
+    assert otari_context.summary()["calls"][-1]["guardrail_skipped"] == "endpoint unreachable"
+
+
+def test_other_400s_are_not_treated_as_guardrail_errors():
+    FakeOtari.reply = status_error(400, {}, "context_length_exceeded")
+    with pytest.raises(openai.APIStatusError):
+        call(model="gpt-4o-mini", anchorcv_guardrail=True)

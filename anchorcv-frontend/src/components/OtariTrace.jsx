@@ -33,6 +33,9 @@ function guardrailVerdict(call) {
   if (!call?.guardrail) {
     return null;
   }
+  if (call.guardrail_skipped) {
+    return { label: "Integrity check skipped", tone: "muted" };
+  }
   try {
     const entries = JSON.parse(call.guardrails || "[]");
     const entry = Array.isArray(entries) ? entries[0] : null;

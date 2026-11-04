@@ -1,0 +1,26 @@
+AYESHA KHAN
+Data Analyst · Lahore, Pakistan · ayesha.khan@example.com · (fictional demo profile)
+
+SUMMARY
+Data analyst with 3 years of experience turning telecom customer data into dashboards and automated reporting. Strong in SQL, Python (pandas) and Power BI; looking to move into product and telemetry analytics.
+
+EXPERIENCE
+Telenor Pakistan — Data Analyst (Jan 2022 – Present), Islamabad
+- Built Power BI dashboards used by 40 regional managers to track churn, recharge revenue and network complaints.
+- Automated the weekly churn report with Python and SQL, cutting preparation from 6 hours to 40 minutes; managers now receive it on Monday morning instead of Wednesday.
+- Led a 3-person data-quality project that reduced duplicate customer records by 18% by standardising phone-number and CNIC matching rules.
+- Wrote DAX measures for retention cohorts and month-over-month churn by region.
+
+Telenor Pakistan — Data Analyst Intern (Jun 2021 – Dec 2021)
+- Cleaned and documented 30+ legacy SQL reports and moved them to a shared repository.
+
+EDUCATION
+MSc Data Science — National University of Sciences and Technology (NUST), Islamabad (2022)
+BSc Statistics — University of the Punjab, Lahore (2019)
+
+SKILLS
+SQL (PostgreSQL, Oracle) · Python (pandas, matplotlib) · Power BI · DAX · Excel · scikit-learn (basic) · Git
+Gap: no hands-on experience yet with cloud data warehouses (Snowflake, BigQuery).
+
+LANGUAGES
+English (fluent), Urdu (native), Punjabi (native)
